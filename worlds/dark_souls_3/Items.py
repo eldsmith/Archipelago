@@ -39,6 +39,103 @@ class DS3ItemCategory(IntEnum):
             DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE
         ]: return 10
         return None
+    
+class DS3EquipType(IntEnum):
+    MELEE = 0
+    RANGED = 1
+    CATALYST = 2
+
+class DS3WeaponCategory(IntEnum):
+    STRAIGHT_BLADE = 0
+    CURVED_BLADE = 1
+    AXE = 2
+    HAMMER = 3
+    POLEARM = 4
+    FIST= 5
+    CLAW = 6
+    WHIP = 7
+    BOW = 8
+    CATALYST = 9
+
+class DS3WeaponSubcategory(IntEnum):
+    DAGGER = 0
+    STRAIGHT_SWORD = 1
+    GREATSWORD = 2
+    ULTRA_GREATSWORD = 3
+    CURVED_SWORD = 4
+    CURVED_GREATSWORD = 5
+    THRUSTING_SWORD = 6
+    KATANA = 7
+    AXE = 8
+    GREATAXE = 9
+    HAMMER = 10
+    GREAT_HAMMER = 11
+    SPEAR = 12
+    HALBEARD = 13
+    PIKE = 14
+    REAPER = 15
+    WHIP = 16
+    FIST = 17
+    CLAW = 18
+    BOW = 19
+    GREATBOW = 20
+    CROSSBOW = 21
+    STAFF = 22
+    TALISMAN = 23
+    PYROMANCY_FLAME = 24
+    SACRED_CHIME = 25
+
+    @property
+    def main_category(self) -> bool:
+        """Returns the main weapon category"""
+        return {
+            DS3WeaponSubcategory.DAGGER:            DS3WeaponCategory.STRAIGHT_BLADE,
+            DS3WeaponSubcategory.STRAIGHT_SWORD:    DS3WeaponCategory.STRAIGHT_BLADE,
+            DS3WeaponSubcategory.GREATSWORD:        DS3WeaponCategory.STRAIGHT_BLADE,
+            DS3WeaponSubcategory.ULTRA_GREATSWORD:  DS3WeaponCategory.STRAIGHT_BLADE,
+            DS3WeaponSubcategory.CURVED_SWORD:      DS3WeaponCategory.CURVED_BLADE,
+            DS3WeaponSubcategory.CURVED_GREATSWORD: DS3WeaponCategory.CURVED_BLADE,
+            DS3WeaponSubcategory.THRUSTING_SWORD:   DS3WeaponCategory.CURVED_BLADE,
+            DS3WeaponSubcategory.KATANA:            DS3WeaponCategory.CURVED_BLADE,
+            DS3WeaponSubcategory.AXE:               DS3WeaponCategory.AXE,
+            DS3WeaponSubcategory.GREATAXE:          DS3WeaponCategory.AXE,
+            DS3WeaponSubcategory.HAMMER:            DS3WeaponCategory.HAMMER,
+            DS3WeaponSubcategory.GREAT_HAMMER:      DS3WeaponCategory.HAMMER,
+            DS3WeaponSubcategory.SPEAR:             DS3WeaponCategory.POLEARM,
+            DS3WeaponSubcategory.HALBEARD:          DS3WeaponCategory.POLEARM,
+            DS3WeaponSubcategory.PIKE:              DS3WeaponCategory.POLEARM,
+            DS3WeaponSubcategory.REAPER:            DS3WeaponCategory.POLEARM,
+            DS3WeaponSubcategory.WHIP:              DS3WeaponCategory.WHIP,
+            DS3WeaponSubcategory.FIST:              DS3WeaponCategory.FIST,
+            DS3WeaponSubcategory.CLAW:              DS3WeaponCategory.CLAW,
+            DS3WeaponSubcategory.BOW:               DS3WeaponCategory.BOW,
+            DS3WeaponSubcategory.GREATBOW:          DS3WeaponCategory.BOW,
+            DS3WeaponSubcategory.CROSSBOW:          DS3WeaponCategory.BOW,
+            DS3WeaponSubcategory.STAFF:             DS3WeaponCategory.CATALYST,
+            DS3WeaponSubcategory.TALISMAN:          DS3WeaponCategory.CATALYST,
+            DS3WeaponSubcategory.PYROMANCY_FLAME:   DS3WeaponCategory.CATALYST,
+            DS3WeaponSubcategory.SACRED_CHIME:      DS3WeaponCategory.CATALYST
+        }[self]
+
+    @property
+    def equip_type(self) -> bool:
+        """Returns the equipment type for simple slot assignment"""
+        if self.main_category in [
+            DS3WeaponCategory.STRAIGHT_BLADE,
+            DS3WeaponCategory.CURVED_BLADE,
+            DS3WeaponCategory.AXE,
+            DS3WeaponCategory.HAMMER,
+            DS3WeaponCategory.POLEARM,
+            DS3WeaponCategory.WHIP,
+            DS3WeaponCategory.FIST,
+            DS3WeaponCategory.CLAW,
+        ]: return DS3EquipType.MELEE
+
+        if self.main_category == DS3WeaponCategory.BOW:
+            return DS3EquipType.RANGED
+
+        if self.main_category == DS3WeaponCategory.CATALYST:
+            return DS3EquipType.CATALYST
 
 
 @dataclass
@@ -105,6 +202,9 @@ class DS3ItemData:
     Otherwise, or if the weapon isn't upgraded, this is the same as ds3_code.
     """
 
+    weapon: DS3WeaponSubcategory = None
+    """The category of the weapon, used for auto equip to determine equipment slots"""
+    
     base_name: Optional[str] = None
     """The name of the individual item, if this is a multi-item group."""
 
