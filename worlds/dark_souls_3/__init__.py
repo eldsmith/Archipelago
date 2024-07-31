@@ -11,7 +11,7 @@ from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import CollectionRule, ItemRule, add_rule, add_item_rule
 
 from .Bosses import DS3BossInfo, all_bosses, default_yhorm_location
-from .Items import DarkSouls3Item, DS3ItemCategory, DS3WeaponSubcategory, DS3WeaponCategory, DS3ItemData, Infusion, UsefulIf, filler_item_names, item_descriptions, item_dictionary, item_name_groups
+from .Items import DarkSouls3Item, DS3ItemCategory, DS3WeaponSubcategory, DS3WeaponCategory, DS3EquipType, DS3ItemData, Infusion, UsefulIf, filler_item_names, item_descriptions, item_dictionary, item_name_groups
 from .Locations import DarkSouls3Location, DS3LocationData, location_tables, location_descriptions, location_dictionary, location_name_groups, region_order
 from .Options import DarkSouls3Options, EarlySmallLothricBanner, option_groups
 
@@ -1500,13 +1500,12 @@ class DarkSouls3World(World):
         auto_equip_slots: Dict[str, int] = {}
 
         for item in item_dictionary.values():
-            if item.weapon is not None:
-                auto_equip_slots[item.name] = item.weapon.equip_type
             if item.ap_code is None: continue
+            if item.ds3_code and item.weapon is not None:
+                auto_equip_slots[str(item.ds3_code)] = item.weapon.types[1]
             if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
             if item.count != 1: item_counts[str(item.ap_code)] = item.count
         
-        print(json.dumps(auto_equip_slots))
         # A map from Archipelago's location IDs to the keys the static randomizer uses to identify
         # locations.
         location_ids_to_keys: Dict[int, str] = {}
@@ -1549,6 +1548,7 @@ class DarkSouls3World(World):
                 else None
             ),
             "apIdsToItemIds": ap_ids_to_ds3_ids,
+            "autoEquipSlots": auto_equip_slots,
             "itemCounts": item_counts,
             "locationIdsToKeys": location_ids_to_keys,
         }
