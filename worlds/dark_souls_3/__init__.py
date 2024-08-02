@@ -11,7 +11,7 @@ from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import CollectionRule, ItemRule, add_rule, add_item_rule
 
 from .Bosses import DS3BossInfo, all_bosses, default_yhorm_location
-from .Items import DarkSouls3Item, DS3ItemCategory, DS3WeaponSubcategory, DS3WeaponCategory, DS3EquipType, DS3ItemData, Infusion, UsefulIf, filler_item_names, item_descriptions, item_dictionary, item_name_groups
+from .Items import DarkSouls3Item, DS3ItemCategory, DS3WeaponCategory, DS3ItemData, Infusion, UsefulIf, filler_item_names, item_descriptions, item_dictionary, item_name_groups
 from .Locations import DarkSouls3Location, DS3LocationData, location_tables, location_descriptions, location_dictionary, location_name_groups, region_order
 from .Options import DarkSouls3Options, EarlySmallLothricBanner, option_groups
 
@@ -420,6 +420,39 @@ class DarkSouls3World(World):
             infusion_percentage = self.options.randomize_infusion_percentage
             if self.random.randint(0, 99) < infusion_percentage:
                 data = data.infuse(self.random.choice(list(Infusion)))
+        
+
+        if self.options.auto_equip and (data.weapon is not None or data.category in [
+            DS3ItemCategory.SHIELD_INFUSIBLE,
+            DS3ItemCategory.SHIELD,
+            DS3ItemCategory.ARMOR,
+            DS3ItemCategory.RING,
+        ]):
+            
+            potential_slots = [
+                [DS3WeaponCategory.M_CLAW,
+                DS3WeaponCategory.M_FIST,
+                DS3WeaponCategory.M_WHIP,
+                DS3WeaponCategory.M_POLEARM,
+                DS3WeaponCategory.M_HAMMER,
+                DS3WeaponCategory.M_AXE,
+                DS3WeaponCategory.M_CURVED_BLADE,
+                DS3WeaponCategory.M_STRAIGHT_BLADE],
+                [DS3WeaponCategory.M_BOW],
+                [],
+                [DS3ItemCategory.SHIELD_INFUSIBLE,DS3ItemCategory.SHIELD],
+                [DS3WeaponCategory.M_CATALYST],
+                [],
+            ]
+
+            if(data.category == DS3ItemCategory.RING):
+                potential_slots = [
+                    [DS3ItemCategory.RING],
+                    [DS3ItemCategory.RING],
+                    [DS3ItemCategory.RING],
+                    [DS3ItemCategory.RING],
+                ]
+            data.equip_slot = data.get_equip_slot(potential_slots)
 
         return DarkSouls3Item(self.player, data, classification=classification)
 
@@ -1500,9 +1533,11 @@ class DarkSouls3World(World):
         auto_equip_slots: Dict[str, int] = {}
 
         for item in item_dictionary.values():
+            equip_slot = 0
             if item.ap_code is None: continue
-            if item.ds3_code and item.weapon is not None:
-                auto_equip_slots[str(item.ds3_code)] = item.weapon.types[1]
+            if item.ds3_code and item.equip_slot is not None:
+                equip_slot = item.equip_slot
+                auto_equip_slots[str(item.name)] = equip_slot
             if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
             if item.count != 1: item_counts[str(item.ap_code)] = item.count
         

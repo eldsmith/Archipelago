@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 import dataclasses
 from enum import IntEnum
-from typing import cast, ClassVar, Dict, Generator, List, Optional, Set
+from typing import cast, ClassVar, Dict, Generator, List, Optional, Set, Union
+from random import choice
 
 from BaseClasses import Item, ItemClassification
 
@@ -38,106 +39,91 @@ class DS3ItemCategory(IntEnum):
             DS3ItemCategory.WEAPON_UPGRADE_10,
             DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE
         ]: return 10
+
         return None
-    
-class DS3EquipType(IntEnum):
-    MELEE = 0
-    RANGED = 1
-    CATALYST = 2
 
 class DS3WeaponCategory(IntEnum):
-    STRAIGHT_BLADE = 0
-    CURVED_BLADE = 1
-    AXE = 2
-    HAMMER = 3
-    POLEARM = 4
-    FIST= 5
-    CLAW = 6
-    WHIP = 7
-    BOW = 8
-    CATALYST = 9
+    """Weapon categories in DS3, mainly used for auto equip"""
+    #Subcategories
+    DAGGER = 51
+    STRAIGHT_SWORD = 52
+    GREATSWORD = 53
+    ULTRA_GREATSWORD = 54
+    CURVED_SWORD = 55
+    CURVED_GREATSWORD = 56
+    THRUSTING_SWORD = 57
+    KATANA = 58
+    AXE = 59
+    GREATAXE = 60
+    HAMMER = 61
+    GREAT_HAMMER = 62
+    SPEAR = 63
+    HALBEARD = 64
+    PIKE = 65
+    REAPER = 66
+    WHIP = 67
+    FIST = 68
+    CLAW = 69
+    BOW = 70
+    GREATBOW = 71
+    CROSSBOW = 72
+    STAFF = 73
+    TALISMAN = 74
+    PYROMANCY_FLAME = 75
+    SACRED_CHIME = 76
 
-class DS3WeaponSubcategory(IntEnum):
-    DAGGER = 0
-    STRAIGHT_SWORD = 1
-    GREATSWORD = 2
-    ULTRA_GREATSWORD = 3
-    CURVED_SWORD = 4
-    CURVED_GREATSWORD = 5
-    THRUSTING_SWORD = 6
-    KATANA = 7
-    AXE = 8
-    GREATAXE = 9
-    HAMMER = 10
-    GREAT_HAMMER = 11
-    SPEAR = 12
-    HALBEARD = 13
-    PIKE = 14
-    REAPER = 15
-    WHIP = 16
-    FIST = 17
-    CLAW = 18
-    BOW = 19
-    GREATBOW = 20
-    CROSSBOW = 21
-    STAFF = 22
-    TALISMAN = 23
-    PYROMANCY_FLAME = 24
-    SACRED_CHIME = 25
+    #Main Categories
+    M_STRAIGHT_BLADE = 100
+    M_CURVED_BLADE = 200
+    M_AXE = 300
+    M_HAMMER = 400
+    M_POLEARM = 500
+    M_FIST= 600
+    M_CLAW = 700
+    M_WHIP = 800
+    M_BOW = 900
+    M_CATALYST = 1000
 
     @property
-    def main_category(self) -> bool:
+    def main_category(self) -> IntEnum:
         """Returns the main weapon category"""
+        if not self.is_subcategory:
+            return self
+        
         return {
-            DS3WeaponSubcategory.DAGGER:            DS3WeaponCategory.STRAIGHT_BLADE,
-            DS3WeaponSubcategory.STRAIGHT_SWORD:    DS3WeaponCategory.STRAIGHT_BLADE,
-            DS3WeaponSubcategory.GREATSWORD:        DS3WeaponCategory.STRAIGHT_BLADE,
-            DS3WeaponSubcategory.ULTRA_GREATSWORD:  DS3WeaponCategory.STRAIGHT_BLADE,
-            DS3WeaponSubcategory.CURVED_SWORD:      DS3WeaponCategory.CURVED_BLADE,
-            DS3WeaponSubcategory.CURVED_GREATSWORD: DS3WeaponCategory.CURVED_BLADE,
-            DS3WeaponSubcategory.THRUSTING_SWORD:   DS3WeaponCategory.CURVED_BLADE,
-            DS3WeaponSubcategory.KATANA:            DS3WeaponCategory.CURVED_BLADE,
-            DS3WeaponSubcategory.AXE:               DS3WeaponCategory.AXE,
-            DS3WeaponSubcategory.GREATAXE:          DS3WeaponCategory.AXE,
-            DS3WeaponSubcategory.HAMMER:            DS3WeaponCategory.HAMMER,
-            DS3WeaponSubcategory.GREAT_HAMMER:      DS3WeaponCategory.HAMMER,
-            DS3WeaponSubcategory.SPEAR:             DS3WeaponCategory.POLEARM,
-            DS3WeaponSubcategory.HALBEARD:          DS3WeaponCategory.POLEARM,
-            DS3WeaponSubcategory.PIKE:              DS3WeaponCategory.POLEARM,
-            DS3WeaponSubcategory.REAPER:            DS3WeaponCategory.POLEARM,
-            DS3WeaponSubcategory.WHIP:              DS3WeaponCategory.WHIP,
-            DS3WeaponSubcategory.FIST:              DS3WeaponCategory.FIST,
-            DS3WeaponSubcategory.CLAW:              DS3WeaponCategory.CLAW,
-            DS3WeaponSubcategory.BOW:               DS3WeaponCategory.BOW,
-            DS3WeaponSubcategory.GREATBOW:          DS3WeaponCategory.BOW,
-            DS3WeaponSubcategory.CROSSBOW:          DS3WeaponCategory.BOW,
-            DS3WeaponSubcategory.STAFF:             DS3WeaponCategory.CATALYST,
-            DS3WeaponSubcategory.TALISMAN:          DS3WeaponCategory.CATALYST,
-            DS3WeaponSubcategory.PYROMANCY_FLAME:   DS3WeaponCategory.CATALYST,
-            DS3WeaponSubcategory.SACRED_CHIME:      DS3WeaponCategory.CATALYST
+            DS3WeaponCategory.DAGGER:            DS3WeaponCategory.M_STRAIGHT_BLADE,
+            DS3WeaponCategory.STRAIGHT_SWORD:    DS3WeaponCategory.M_STRAIGHT_BLADE,
+            DS3WeaponCategory.GREATSWORD:        DS3WeaponCategory.M_STRAIGHT_BLADE,
+            DS3WeaponCategory.ULTRA_GREATSWORD:  DS3WeaponCategory.M_STRAIGHT_BLADE,
+            DS3WeaponCategory.CURVED_SWORD:      DS3WeaponCategory.M_CURVED_BLADE,
+            DS3WeaponCategory.CURVED_GREATSWORD: DS3WeaponCategory.M_CURVED_BLADE,
+            DS3WeaponCategory.THRUSTING_SWORD:   DS3WeaponCategory.M_CURVED_BLADE,
+            DS3WeaponCategory.KATANA:            DS3WeaponCategory.M_CURVED_BLADE,
+            DS3WeaponCategory.AXE:               DS3WeaponCategory.M_AXE,
+            DS3WeaponCategory.GREATAXE:          DS3WeaponCategory.M_AXE,
+            DS3WeaponCategory.HAMMER:            DS3WeaponCategory.M_HAMMER,
+            DS3WeaponCategory.GREAT_HAMMER:      DS3WeaponCategory.M_HAMMER,
+            DS3WeaponCategory.SPEAR:             DS3WeaponCategory.M_POLEARM,
+            DS3WeaponCategory.HALBEARD:          DS3WeaponCategory.M_POLEARM,
+            DS3WeaponCategory.PIKE:              DS3WeaponCategory.M_POLEARM,
+            DS3WeaponCategory.REAPER:            DS3WeaponCategory.M_POLEARM,
+            DS3WeaponCategory.WHIP:              DS3WeaponCategory.M_WHIP,
+            DS3WeaponCategory.FIST:              DS3WeaponCategory.M_FIST,
+            DS3WeaponCategory.CLAW:              DS3WeaponCategory.M_CLAW,
+            DS3WeaponCategory.BOW:               DS3WeaponCategory.M_BOW,
+            DS3WeaponCategory.GREATBOW:          DS3WeaponCategory.M_BOW,
+            DS3WeaponCategory.CROSSBOW:          DS3WeaponCategory.M_BOW,
+            DS3WeaponCategory.STAFF:             DS3WeaponCategory.M_CATALYST,
+            DS3WeaponCategory.TALISMAN:          DS3WeaponCategory.M_CATALYST,
+            DS3WeaponCategory.PYROMANCY_FLAME:   DS3WeaponCategory.M_CATALYST,
+            DS3WeaponCategory.SACRED_CHIME:      DS3WeaponCategory.M_CATALYST,
         }[self]
-
+    
     @property
-    def equip_type(self) -> bool:
-        """Returns the equipment type for simple slot assignment"""
-        if self.main_category in [
-            DS3WeaponCategory.STRAIGHT_BLADE,
-            DS3WeaponCategory.CURVED_BLADE,
-            DS3WeaponCategory.AXE,
-            DS3WeaponCategory.HAMMER,
-            DS3WeaponCategory.POLEARM,
-            DS3WeaponCategory.WHIP,
-            DS3WeaponCategory.FIST,
-            DS3WeaponCategory.CLAW,
-        ]: return DS3EquipType.MELEE
-
-        if self.main_category == DS3WeaponCategory.BOW:
-            return DS3EquipType.RANGED
-
-        if self.main_category == DS3WeaponCategory.CATALYST:
-            return DS3EquipType.CATALYST
-
-
+    def is_subcategory(self) -> bool:
+        """Returns true if this category is a subcategory"""
+        return self < 100
+    
 @dataclass
 class Infusion(IntEnum):
     """Infusions supported by Dark Souls III.
@@ -195,6 +181,9 @@ class DS3ItemData:
     name: str
     ds3_code: Optional[int]
     category: DS3ItemCategory
+    
+    """The assigned equipment slot if auto equip is on"""
+    equip_slot: int = None
 
     base_ds3_code: Optional[int] = None
     """If this is an upgradable weapon, the base ID of the weapon it upgrades from.
@@ -202,7 +191,7 @@ class DS3ItemData:
     Otherwise, or if the weapon isn't upgraded, this is the same as ds3_code.
     """
 
-    weapon: DS3WeaponSubcategory = None
+    weapon: DS3WeaponCategory = None
     """The category of the weapon, used for auto equip to determine equipment slots"""
     
     base_name: Optional[str] = None
@@ -338,6 +327,26 @@ class DS3ItemData:
             ds3_code = cast(int, self.ds3_code) + level,
             filler = False,
         )
+    
+    def get_equip_slot(self, slot_options: List[List[Union[DS3WeaponCategory, DS3ItemCategory]]]) -> int:
+        """Turns a list of slot options into an int representing the items slot value"""
+        if(self.category == DS3ItemCategory.ARMOR):
+            return 10 # Armor is not put in slots, 10 is reserved for marking armor
+        
+        slot_option_length = 4 if self.category == DS3ItemCategory.RING else 6
+
+        if(len(slot_options) != slot_option_length):
+            raise RuntimeError(f"""{self.name}: received invalid number of equip slot options, 
+                               f'should be {slot_option_length}: Received {len(slot_options)}""")
+
+        potential_slots = []
+        for i in range(len(slot_options)):
+            potential_slots += [i+1 for e in slot_options[i] 
+                                if (self.weapon and (e == self.weapon or e == self.weapon.main_category)) 
+                                or e == self.category ]
+        if(len(potential_slots) == 0):
+            return 0  # If no potential rules exist, we return 0, this item will never be equipped
+        return choice(potential_slots)
 
 
 class DarkSouls3Item(Item):
@@ -392,397 +401,397 @@ _vanilla_items = [
 
     # Weapons
     DS3ItemData("Dagger",                              0x000F4240, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Bandit's Knife",                      0x000F6950, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Parrying Dagger",                     0x000F9060, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Rotten Ghru Dagger",                  0x000FDE80, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Harpe",                               0x00102CA0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Scholar's Candlestick",               0x001053B0, DS3ItemCategory.WEAPON_UPGRADE_10,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Tailbone Short Sword",                0x00107AC0, DS3ItemCategory.WEAPON_UPGRADE_10,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Corvian Greatknife",                  0x0010A1D0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Handmaid's Dagger",                   0x00111700, DS3ItemCategory.WEAPON_UPGRADE_10,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Shortsword",                          0x001E8480, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Longsword",                           0x001EAB90, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Broadsword",                          0x001ED2A0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Broken Straight Sword",               0x001EF9B0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Lothric Knight Sword",                0x001F6EE0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Sunlight Straight Sword",             0x00203230, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Rotten Ghru Curved Sword",            0x00205940, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Irithyll Straight Sword",             0x0020A760, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Cleric's Candlestick",                0x0020F580, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Morion Blade",                        0x002143A0, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Astora Straight Sword",               0x002191C0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Barbed Straight Sword",               0x0021B8D0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Executioner's Greatsword",            0x0021DFE0, DS3ItemCategory.WEAPON_UPGRADE_10,
-                weapon=DS3WeaponSubcategory.GREATSWORD),
+                weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Anri's Straight Sword",               0x002206F0, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+                weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Estoc",                               0x002DC6C0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.THRUSTING_SWORD),
+                weapon=DS3WeaponCategory.THRUSTING_SWORD),
     DS3ItemData("Mail Breaker",                        0x002DEDD0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.DAGGER),
+                weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Rapier",                              0x002E14E0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.THRUSTING_SWORD),
+                weapon=DS3WeaponCategory.THRUSTING_SWORD),
     DS3ItemData("Ricard's Rapier",                     0x002E3BF0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.THRUSTING_SWORD),
+                weapon=DS3WeaponCategory.THRUSTING_SWORD),
     DS3ItemData("Crystal Sage's Rapier",               0x002E6300, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.THRUSTING_SWORD),
+                weapon=DS3WeaponCategory.THRUSTING_SWORD),
     DS3ItemData("Irithyll Rapier",                     0x002E8A10, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.THRUSTING_SWORD),
+                weapon=DS3WeaponCategory.THRUSTING_SWORD),
     DS3ItemData("Shotel",                              0x003D3010, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Scimitar",                            0x003D7E30, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Falchion",                            0x003DA540, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Carthus Curved Sword",                0x003DCC50, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Carthus Curved Greatsword",           0x003DF360, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.CURVED_GREATSWORD),
+                weapon=DS3WeaponCategory.CURVED_GREATSWORD),
     DS3ItemData("Pontiff Knight Curved Sword",         0x003E1A70, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Storm Curved Sword",                  0x003E4180, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Painting Guardian's Curved Sword",    0x003E6890, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Crescent Moon Sword",                 0x003E8FA0, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Carthus Shotel",                      0x003EB6B0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.CURVED_SWORD),
+                weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Uchigatana",                          0x004C4B40, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.KATANA),
+                weapon=DS3WeaponCategory.KATANA),
     DS3ItemData("Washing Pole",                        0x004C7250, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.KATANA),
+                weapon=DS3WeaponCategory.KATANA),
     DS3ItemData("Chaos Blade",                         0x004C9960, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.KATANA),
+                weapon=DS3WeaponCategory.KATANA),
     DS3ItemData("Black Blade",                         0x004CC070, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.KATANA),
+                weapon=DS3WeaponCategory.KATANA),
     DS3ItemData("Bloodlust",                           0x004CE780, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.KATANA,
+                weapon=DS3WeaponCategory.KATANA,
                 inject = True), # Covenant reward
     DS3ItemData("Darkdrift",                           0x004D0E90, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.KATANA),
+				weapon=DS3WeaponCategory.KATANA),
     DS3ItemData("Bastard Sword",                       0x005B8D80, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Claymore",                            0x005BDBA0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Zweihander",                          0x005C29C0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Greatsword",                          0x005C50D0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Astora Greatsword",                   0x005C9EF0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Murakumo",                            0x005CC600, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.CURVED_GREATSWORD),
+				weapon=DS3WeaponCategory.CURVED_GREATSWORD),
     DS3ItemData("Lothric Knight Greatsword",           0x005D1420, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Flamberge",                           0x005DB060, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Exile Greatsword",                    0x005DD770, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.CURVED_GREATSWORD),
+				weapon=DS3WeaponCategory.CURVED_GREATSWORD),
     DS3ItemData("Greatsword of Judgment",              0x005E2590, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Profaned Greatsword",                 0x005E4CA0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Cathedral Knight Greatsword",         0x005E73B0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Farron Greatsword",                   0x005E9AC0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Yhorm's Great Machete",               0x005F0FF0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATAXE),
+				weapon=DS3WeaponCategory.GREATAXE),
     DS3ItemData("Dark Sword",                          0x005F3700, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+				weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Black Knight Sword",                  0x005F5E10, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Lorian's Greatsword",                 0x005F8520, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Twin Princes' Greatsword",            0x005FAC30, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Lothric's Holy Sword",                0x005FD340, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+				weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Wolnir's Holy Sword",                 0x005FFA50, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Wolf Knight's Greatsword",            0x00602160, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Greatsword of Artorias",              0x0060216A, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.GREATSWORD),
+                weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Hollowslayer Greatsword",             0x00604870, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Moonlight Greatsword",                0x00606F80, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Drakeblood Greatsword",               0x00609690, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Firelink Greatsword",                 0x0060BDA0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATSWORD),
+				weapon=DS3WeaponCategory.GREATSWORD),
     DS3ItemData("Fume Ultra Greatsword",               0x0060E4B0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.ULTRA_GREATSWORD),
+				weapon=DS3WeaponCategory.ULTRA_GREATSWORD),
     DS3ItemData("Old Wolf Curved Sword",               0x00610BC0, DS3ItemCategory.WEAPON_UPGRADE_5,
                 inject = True), # Covenant reward
     DS3ItemData("Storm Ruler",                         0x006132D0, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.GREATSWORD,
+                weapon=DS3WeaponCategory.GREATSWORD,
                 classification = ItemClassification.progression),
     DS3ItemData("Hand Axe",                            0x006ACFC0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.AXE),
+				weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Battle Axe",                          0x006AF6D0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.AXE),
+				weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Deep Battle Axe",                     0x006AFA54, DS3ItemCategory.WEAPON_UPGRADE_10,
-                weapon=DS3WeaponSubcategory.AXE),
+                weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Brigand Axe",                         0x006B1DE0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.AXE),
+				weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Crescent Axe",                        0x006B6C00, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Greataxe",                            0x006B9310, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREATAXE),
+				weapon=DS3WeaponCategory.GREATAXE),
     DS3ItemData("Butcher Knife",                       0x006BE130, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.AXE),
+				weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Dragonslayer's Axe",                  0x006C0840, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.AXE),
+				weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Thrall Axe",                          0x006C5660, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.AXE),
+				weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Dragonslayer Greataxe",               0x006C7D70, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATAXE),
+				weapon=DS3WeaponCategory.GREATAXE),
     DS3ItemData("Demon's Greataxe",                    0x006CA480, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATAXE),
+				weapon=DS3WeaponCategory.GREATAXE),
     DS3ItemData("Eleonora",                            0x006CCB90, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.AXE,
+                weapon=DS3WeaponCategory.AXE,
                 classification = ItemClassification.progression), # Crow trade
     DS3ItemData("Man Serpent Hatchet",                 0x006D19B0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.AXE),
+				weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Club",                                0x007A1200, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HAMMER),
+				weapon=DS3WeaponCategory.HAMMER),
     DS3ItemData("Mace",                                0x007A3910, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HAMMER),
+				weapon=DS3WeaponCategory.HAMMER),
     DS3ItemData("Morning Star",                        0x007A6020, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HAMMER),
+				weapon=DS3WeaponCategory.HAMMER),
     DS3ItemData("Reinforced Club",                     0x007A8730, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HAMMER),
+				weapon=DS3WeaponCategory.HAMMER),
     DS3ItemData("Large Club",                          0x007AFC60, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Great Club",                          0x007B4A80, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Great Mace",                          0x007BBFB0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Great Wooden Hammer",                 0x007C8300, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Gargoyle Flame Hammer",               0x007CAA10, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Vordt's Great Hammer",                0x007CD120, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Old King's Great Hammer",             0x007CF830, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Heysel Pick",                         0x007D6D60, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.HAMMER),
+				weapon=DS3WeaponCategory.HAMMER),
     DS3ItemData("Warpick",                             0x007DBB80, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HAMMER),
+				weapon=DS3WeaponCategory.HAMMER),
     DS3ItemData("Pickaxe",                             0x007DE290, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Dragon Tooth",                        0x007E09A0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Smough's Great Hammer",               0x007E30B0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Blacksmith Hammer",                   0x007E57C0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.HAMMER,
+                weapon=DS3WeaponCategory.HAMMER,
                 classification = ItemClassification.progression), # Crow trade
     DS3ItemData("Morne's Great Hammer",                0x007E7ED0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Spiked Mace",                         0x007EA5E0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREAT_HAMMER),
+				weapon=DS3WeaponCategory.GREAT_HAMMER),
     DS3ItemData("Spear",                               0x00895440, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Winged Spear",                        0x00897B50, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Partizan",                            0x0089C970, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Greatlance",                          0x008A8CC0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.PIKE),
+				weapon=DS3WeaponCategory.PIKE),
     DS3ItemData("Lothric Knight Long Spear",           0x008AB3D0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.PIKE),
+				weapon=DS3WeaponCategory.PIKE),
     DS3ItemData("Gargoyle Flame Spear",                0x008B01F0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Rotten Ghru Spear",                   0x008B2900, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Tailbone Spear",                      0x008B5010, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Soldering Iron",                      0x008B7720, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Dragonslayer Swordspear",             0x008BC540, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Arstor's Spear",                      0x008BEC50, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Saint Bident",                        0x008C1360, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Yorshka's Spear",                     0x008C3A70, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Pike",                                0x008C6180, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.PIKE),
+				weapon=DS3WeaponCategory.PIKE),
     DS3ItemData("Heavy Four-pronged Plow",             0x008ADAE0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-                weapon=DS3WeaponSubcategory.SPEAR),
+                weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Dragonslayer Spear",                  0x008CAFA0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Great Scythe",                        0x00989680, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.REAPER),
+				weapon=DS3WeaponCategory.REAPER),
     DS3ItemData("Lucerne",                             0x0098BD90, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Glaive",                              0x0098E4A0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Halberd",                             0x00990BB0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Black Knight Greataxe",               0x009959D0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATAXE),
+				weapon=DS3WeaponCategory.GREATAXE),
     DS3ItemData("Pontiff Knight Great Scythe",         0x0099A7F0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.REAPER),
+				weapon=DS3WeaponCategory.REAPER),
     DS3ItemData("Great Corvian Scythe",                0x0099CF00, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.REAPER),
+				weapon=DS3WeaponCategory.REAPER),
     DS3ItemData("Winged Knight Halberd",               0x0099F610, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Gundyr's Halberd",                    0x009A1D20, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Red Hilted Halberd",                  0x009AB960, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Black Knight Glaive",                 0x009AE070, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Immolation Tinder",                   0x009B0780, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.HALBEARD),
+				weapon=DS3WeaponCategory.HALBEARD),
     DS3ItemData("Claw",                                0x00A7D8C0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.CLAW),
+				weapon=DS3WeaponCategory.CLAW),
     DS3ItemData("Caestus",                             0x00A7FFD0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.FIST),
+				weapon=DS3WeaponCategory.FIST),
     DS3ItemData("Manikin Claws",                       0x00A826E0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.CLAW),
+				weapon=DS3WeaponCategory.CLAW),
     DS3ItemData("Demon's Fist",                        0x00A84DF0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.FIST),
+				weapon=DS3WeaponCategory.FIST),
     DS3ItemData("Dark Hand",                           0x00A87500, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.FIST),
+				weapon=DS3WeaponCategory.FIST),
     DS3ItemData("Whip",                                0x00B71B00, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.WHIP),
+				weapon=DS3WeaponCategory.WHIP),
     DS3ItemData("Witch's Locks",                       0x00B7B740, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.WHIP),
+				weapon=DS3WeaponCategory.WHIP),
     DS3ItemData("Notched Whip",                        0x00B7DE50, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.WHIP),
+				weapon=DS3WeaponCategory.WHIP),
     DS3ItemData("Spotted Whip",                        0x00B80560, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.WHIP),
+				weapon=DS3WeaponCategory.WHIP),
     DS3ItemData("Talisman",                            0x00C72090, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.TALISMAN),
+				weapon=DS3WeaponCategory.TALISMAN),
     DS3ItemData("Sorcerer's Staff",                    0x00C747A0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.STAFF),
+				weapon=DS3WeaponCategory.STAFF),
     DS3ItemData("Storyteller's Staff",                 0x00C76EB0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.STAFF),
+				weapon=DS3WeaponCategory.STAFF),
     DS3ItemData("Mendicant's Staff",                   0x00C795C0, DS3ItemCategory.WEAPON_UPGRADE_10,
-                weapon=DS3WeaponSubcategory.STAFF,
+                weapon=DS3WeaponCategory.STAFF,
                 classification = ItemClassification.progression, # Crow trade
                 inject = True), # This is just a random drop normally, but we need it in-logic
     DS3ItemData("Man-grub's Staff",                    0x00C7E3E0, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.STAFF,
+                weapon=DS3WeaponCategory.STAFF,
                 inject = True), # Covenant reward
     DS3ItemData("Archdeacon's Great Staff",            0x00C80AF0, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.STAFF,
+                weapon=DS3WeaponCategory.STAFF,
                 inject = True), # Covenant reward
     DS3ItemData("Golden Ritual Spear",                 0x00C83200, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Yorshka's Chime",                     0x00C88020, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.SACRED_CHIME),
+				weapon=DS3WeaponCategory.SACRED_CHIME),
     DS3ItemData("Sage's Crystal Staff",                0x00C8CE40, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.STAFF),
+				weapon=DS3WeaponCategory.STAFF),
     DS3ItemData("Heretic's Staff",                     0x00C8F550, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.STAFF),
+				weapon=DS3WeaponCategory.STAFF),
     DS3ItemData("Court Sorcerer's Staff",              0x00C91C60, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.STAFF),
+				weapon=DS3WeaponCategory.STAFF),
     DS3ItemData("Witchtree Branch",                    0x00C94370, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.STAFF),
+				weapon=DS3WeaponCategory.STAFF),
     DS3ItemData("Izalith Staff",                       0x00C96A80, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.STAFF),
+				weapon=DS3WeaponCategory.STAFF),
     DS3ItemData("Cleric's Sacred Chime",               0x00C99190, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.SACRED_CHIME),
+				weapon=DS3WeaponCategory.SACRED_CHIME),
     DS3ItemData("Priest's Chime",                      0x00C9B8A0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.SACRED_CHIME),
+				weapon=DS3WeaponCategory.SACRED_CHIME),
     DS3ItemData("Saint-tree Bellvine",                 0x00C9DFB0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.SACRED_CHIME),
+				weapon=DS3WeaponCategory.SACRED_CHIME),
     DS3ItemData("Caitha's Chime",                      0x00CA06C0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SACRED_CHIME),
+				weapon=DS3WeaponCategory.SACRED_CHIME),
     DS3ItemData("Crystal Chime",                       0x00CA2DD0, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.SACRED_CHIME),
+				weapon=DS3WeaponCategory.SACRED_CHIME),
     DS3ItemData("Sunlight Talisman",                   0x00CA54E0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.TALISMAN),
+				weapon=DS3WeaponCategory.TALISMAN),
     DS3ItemData("Canvas Talisman",                     0x00CA7BF0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.TALISMAN),
+				weapon=DS3WeaponCategory.TALISMAN),
     DS3ItemData("Sunless Talisman",                    0x00CAA300, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.TALISMAN),
+				weapon=DS3WeaponCategory.TALISMAN),
     DS3ItemData("Saint's Talisman",                    0x00CACA10, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.TALISMAN),
+				weapon=DS3WeaponCategory.TALISMAN),
     DS3ItemData("White Hair Talisman",                 0x00CAF120, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.TALISMAN),
+				weapon=DS3WeaponCategory.TALISMAN),
     DS3ItemData("Pyromancy Flame",                     0x00CC77C0, DS3ItemCategory.WEAPON_UPGRADE_10,
-                weapon=DS3WeaponSubcategory.PYROMANCY_FLAME,
+                weapon=DS3WeaponCategory.PYROMANCY_FLAME,
                 classification = ItemClassification.progression),
     DS3ItemData("Dragonslayer Greatbow",               0x00CF8500, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATBOW),
+				weapon=DS3WeaponCategory.GREATBOW),
     DS3ItemData("Short Bow",                           0x00D5C690, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.BOW),
+				weapon=DS3WeaponCategory.BOW),
     DS3ItemData("Composite Bow",                       0x00D5EDA0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.BOW),
+				weapon=DS3WeaponCategory.BOW),
     DS3ItemData("Light Crossbow",                      0x00D63BC0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.CROSSBOW),
+				weapon=DS3WeaponCategory.CROSSBOW),
     DS3ItemData("Arbalest",                            0x00D662D0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.CROSSBOW),
+				weapon=DS3WeaponCategory.CROSSBOW),
     DS3ItemData("Longbow",                             0x00D689E0, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.BOW),
+				weapon=DS3WeaponCategory.BOW),
     DS3ItemData("Dragonrider Bow",                     0x00D6B0F0, DS3ItemCategory.WEAPON_UPGRADE_5,
-                weapon=DS3WeaponSubcategory.BOW),
+                weapon=DS3WeaponCategory.BOW),
     DS3ItemData("Avelyn",                              0x00D6FF10, DS3ItemCategory.WEAPON_UPGRADE_10,
-                weapon=DS3WeaponSubcategory.CROSSBOW,
+                weapon=DS3WeaponCategory.CROSSBOW,
                 classification = ItemClassification.progression), # Crow trade
     DS3ItemData("Knight's Crossbow",                   0x00D72620, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.CROSSBOW),
+				weapon=DS3WeaponCategory.CROSSBOW),
     DS3ItemData("Heavy Crossbow",                      0x00D74D30, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.CROSSBOW),
+				weapon=DS3WeaponCategory.CROSSBOW),
     DS3ItemData("Darkmoon Longbow",                    0x00D79B50, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.BOW),
+				weapon=DS3WeaponCategory.BOW),
     DS3ItemData("Onislayer Greatbow",                  0x00D7C260, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.GREATBOW),
+				weapon=DS3WeaponCategory.GREATBOW),
     DS3ItemData("Black Bow of Pharis",                 0x00D7E970, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.BOW),
+				weapon=DS3WeaponCategory.BOW),
     DS3ItemData("Sniper Crossbow",                     0x00D83790, DS3ItemCategory.WEAPON_UPGRADE_10,
-				weapon=DS3WeaponSubcategory.CROSSBOW),
+				weapon=DS3WeaponCategory.CROSSBOW),
     DS3ItemData("Sellsword Twinblades",                0x00F42400, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.CURVED_SWORD),
+				weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Warden Twinblades",                   0x00F47220, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.CURVED_SWORD),
+				weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Winged Knight Twinaxes",              0x00F49930, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.AXE),
+				weapon=DS3WeaponCategory.AXE),
     DS3ItemData("Dancer's Enchanted Swords",           0x00F4C040, DS3ItemCategory.WEAPON_UPGRADE_5,
-				weapon=DS3WeaponSubcategory.CURVED_SWORD),
+				weapon=DS3WeaponCategory.CURVED_SWORD),
     DS3ItemData("Great Machete",                       0x00F4E750, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.GREATAXE),
+				weapon=DS3WeaponCategory.GREATAXE),
     DS3ItemData("Brigand Twindaggers",                 0x00F50E60, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.DAGGER),
+				weapon=DS3WeaponCategory.DAGGER),
     DS3ItemData("Gotthard Twinswords",                 0x00F53570, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.STRAIGHT_SWORD),
+				weapon=DS3WeaponCategory.STRAIGHT_SWORD),
     DS3ItemData("Onikiri and Ubadachi",                0x00F58390, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.KATANA),
+				weapon=DS3WeaponCategory.KATANA),
     DS3ItemData("Drang Twinspears",                    0x00F5AAA0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.SPEAR),
+				weapon=DS3WeaponCategory.SPEAR),
     DS3ItemData("Drang Hammers",                       0x00F61FD0, DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE,
-				weapon=DS3WeaponSubcategory.HAMMER),
+				weapon=DS3WeaponCategory.HAMMER),
 
     # Shields
     DS3ItemData("Buckler",                             0x01312D00, DS3ItemCategory.SHIELD_INFUSIBLE),
