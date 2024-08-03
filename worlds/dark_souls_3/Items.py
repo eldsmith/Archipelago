@@ -44,6 +44,8 @@ class DS3ItemCategory(IntEnum):
 
 class DS3WeaponCategory(IntEnum):
     """Weapon categories in DS3, mainly used for auto equip"""
+    NO_EQUIP = 50
+    
     #Subcategories
     DAGGER = 51
     STRAIGHT_SWORD = 52
@@ -123,6 +125,66 @@ class DS3WeaponCategory(IntEnum):
     def is_subcategory(self) -> bool:
         """Returns true if this category is a subcategory"""
         return self < 100
+    
+    @staticmethod
+    def get_all_categories() -> dict:
+        return {
+            "No Equipment" : DS3WeaponCategory.NO_EQUIP,
+            "All Melee Weapons": [
+                DS3WeaponCategory.M_STRAIGHT_BLADE,
+                DS3WeaponCategory.M_CURVED_BLADE,
+                DS3WeaponCategory.M_AXE,
+                DS3WeaponCategory.M_HAMMER,
+                DS3WeaponCategory.M_POLEARM,
+                DS3WeaponCategory.M_WHIP,
+                DS3WeaponCategory.M_FIST,
+                DS3WeaponCategory.M_CLAW,
+            ],
+            "All Ranged Weapons": DS3WeaponCategory.M_BOW,
+            "All Catalysts": DS3WeaponCategory.M_CATALYST,
+
+            "All Straight Blade Weapons": DS3WeaponCategory.M_STRAIGHT_BLADE,
+            "All Curved Blade Weapons": DS3WeaponCategory.M_CURVED_BLADE,
+            "All Axe Weapons": DS3WeaponCategory.M_AXE,
+            "All Hammer Weapons": DS3WeaponCategory.M_HAMMER, 
+            "All Polearm Weapons": DS3WeaponCategory.M_HAMMER, 
+            "All Whip Weapons": DS3WeaponCategory.M_HAMMER, 
+            "All Fist Weapons": DS3WeaponCategory.M_HAMMER, 
+            "All Claw Weapons": DS3WeaponCategory.M_HAMMER, 
+            # TODO: Should probably just add shields to DS3WeaponCategory, with their own categories
+            # and change the class name to DS3Equippables
+            "All Shields": [DS3ItemCategory.SHIELD, DS3ItemCategory.SHIELD_INFUSIBLE], 
+
+            # Some main categories are single category so the subcategories are technically repeating, this is done 
+            # intentionally in case of user confusion believing that perhaps single category subcategories belong 
+            # to another main category and thus could be accidentally omitted
+            "Dagger (Straight Blade)": DS3WeaponCategory.DAGGER,
+            "Straight Sword (Straight Blade)": DS3WeaponCategory.STRAIGHT_SWORD,
+            "Greatsword (Straight Blade)": DS3WeaponCategory.GREATSWORD,
+            "Ultra Greatsword (Straight Blade)": DS3WeaponCategory.ULTRA_GREATSWORD,
+            "Curved Sword (Curved Sword)": DS3WeaponCategory.CURVED_SWORD,
+            "Curved  (Curved Sword)": DS3WeaponCategory.CURVED_GREATSWORD,
+            "Thrusting Sword (Curved Sword)": DS3WeaponCategory.THRUSTING_SWORD,
+            "Katana (Curved Sword)": DS3WeaponCategory.KATANA,
+            "Axe (Axe)": DS3WeaponCategory.AXE,
+            "Greataxe (Axe)": DS3WeaponCategory.GREATAXE,
+            "Hammer (Hammer)": DS3WeaponCategory.HAMMER,
+            "Great Hammer (Hammer)": DS3WeaponCategory.GREAT_HAMMER,
+            "Spear (Polearm)": DS3WeaponCategory.SPEAR,
+            "Halberd (Polearm)": DS3WeaponCategory.HALBEARD,
+            "Pike (Polearm)": DS3WeaponCategory.PIKE,
+            "Reaper (Polearm)": DS3WeaponCategory.REAPER,
+            "Whip (Whip)": DS3WeaponCategory.WHIP,
+            "Fist (Fist)": DS3WeaponCategory.FIST,
+            "Claw (Claw)": DS3WeaponCategory.CLAW,
+            "Bow (Bow)": DS3WeaponCategory.BOW,
+            "Greatbow (Bow)": DS3WeaponCategory.GREATBOW,
+            "Crossbow (Bow)": DS3WeaponCategory.CROSSBOW,
+            "Staff (Catalyst)": DS3WeaponCategory.STAFF,
+            "Talisman (Catalyst)": DS3WeaponCategory.TALISMAN,
+            "Pyromancy Flame (Catalyst)": DS3WeaponCategory.PYROMANCY_FLAME,
+            "Sacred Chime (Catalyst)": DS3WeaponCategory.SACRED_CHIME,
+        }
     
 @dataclass
 class Infusion(IntEnum):
@@ -328,22 +390,39 @@ class DS3ItemData:
             filler = False,
         )
     
-    def get_equip_slot(self, slot_options: List[List[Union[DS3WeaponCategory, DS3ItemCategory]]]) -> int:
+    def get_equip_slot(self, slot_options: List) -> int:
         """Turns a list of slot options into an int representing the items slot value"""
         if(self.category == DS3ItemCategory.ARMOR):
             return 10 # Armor is not put in slots, 10 is reserved for marking armor
         
         slot_option_length = 4 if self.category == DS3ItemCategory.RING else 6
 
-        if(len(slot_options) != slot_option_length):
-            raise RuntimeError(f"""{self.name}: received invalid number of equip slot options, 
-                               f'should be {slot_option_length}: Received {len(slot_options)}""")
+        if(len(slot_options) > slot_option_length):
+            raise RuntimeError(f"""{self.name}: equip slot options over range, 
+                               f'maximum {slot_option_length}: Received {len(slot_options)}""")
 
         potential_slots = []
+        all_categories = DS3WeaponCategory.get_all_categories()
         for i in range(len(slot_options)):
-            potential_slots += [i+1 for e in slot_options[i] 
+            current_slot = []
+            for category in all_categories.keys():
+                if category in slot_options[i]:
+                    category_to_push = all_categories[category]
+                    if isinstance(category_to_push, list):
+                        current_slot.extend(category_to_push)
+                    else:
+                        current_slot.append(category_to_push)
+            if len(current_slot) == 0:
+                potential_slots += [i+1]
+                continue
+            if DS3WeaponCategory.NO_EQUIP in current_slot: 
+                continue
+            print(current_slot, self.name)
+            potential_slots += [i+1 for e in current_slot
                                 if (self.weapon and (e == self.weapon or e == self.weapon.main_category)) 
                                 or e == self.category ]
+        
+        print(potential_slots,self.name)
         if(len(potential_slots) == 0):
             return 0  # If no potential rules exist, we return 0, this item will never be equipped
         return choice(potential_slots)

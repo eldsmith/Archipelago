@@ -1,10 +1,11 @@
 from copy import deepcopy
 from dataclasses import dataclass
+from .Items import DS3WeaponCategory
 import json
 from typing import Any, Dict
 
 from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, Option, OptionGroup, \
-    PerGameCommonOptions, Range, Removed, Toggle, VerifyKeys
+    PerGameCommonOptions, Range, Removed, Toggle, VerifyKeys, OptionList
 
 ## Game Options
 
@@ -179,6 +180,142 @@ class LockEquipOption(Toggle):
     """
     display_name = "Lock Equipment Slots"
 
+class AutoEquipRight1(OptionList):
+    """Map which types of weapons can be equipped to Right1 
+
+    If you select no values, all weapons can be equipped to this slot (aside from shields)
+
+    - **Empty Slot:** If you select this option, all other options will be ignored and no
+      equipment will ever fill this slot
+    - **All * Weapons** These are main categories that have multiple sub categories, you can
+      look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
+    - **Subcategory (Main category)** The subcategory weapons look like this, 
+      ex. Dagger (Straight Blade)
+
+    If you assign the same types of weapons to multiple slots it will be randomized which of
+    the slots the weapon will be equipped to, you can also add the same value multiple times
+    to this option in the .yaml to increase the odds of that weapon being selected for that slot
+    """
+    display_name = "Auto Equip Right 1 Slot"
+    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+
+class AutoEquipRight2(OptionList):
+    """Map which types of weapons can be equipped to Right2
+
+    If you select no values, all weapons can be equipped to this slot (aside from shields)
+
+    - **Empty Slot:** If you select this option, all other options will be ignored and no
+      equipment will ever fill this slot
+    - **All * Weapons** These are main categories that have multiple sub categories, you can
+      look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
+    - **Subcategory (Main category)** The subcategory weapons look like this, 
+      ex. Dagger (Straight Blade)
+
+    If you assign the same types of weapons to multiple slots it will be randomized which of
+    the slots the weapon will be equipped to, you can also add the same value multiple times
+    to this option in the .yaml to increase the odds of that weapon being selected for that slot
+    """
+    display_name = "Auto Equip Right 2 Slot"
+    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+
+class AutoEquipRight3(OptionList):
+    """Map which types of weapons can be equipped to Right3
+
+    If you select no values, all weapons can be equipped to this slot (aside from shields)
+
+    - **Empty Slot:** If you select this option, all other options will be ignored and no
+      equipment will ever fill this slot
+    - **All * Weapons** These are main categories that have multiple sub categories, you can
+      look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
+    - **Subcategory (Main category)** The subcategory weapons look like this, 
+      ex. Dagger (Straight Blade)
+
+    If you assign the same types of weapons to multiple slots it will be randomized which of
+    the slots the weapon will be equipped to, you can also add the same value multiple times
+    to this option in the .yaml to increase the odds of that weapon being selected for that slot
+    """
+    display_name = "Auto Equip Right 3 Slot"
+    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+
+class AutoEquipLeft1(OptionList):
+    """Map which types of weapons can be equipped to Left1
+
+    If you select no values, all weapons can be equipped to this slot
+
+    - **Empty Slot:** If you select this option, all other options will be ignored and no
+      equipment will ever fill this slot
+    - **All * Weapons** These are main categories that have multiple sub categories, you can
+      look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
+    - **Subcategory (Main category)** The subcategory weapons look like this, 
+      ex. Dagger (Straight Blade)
+
+    If you assign the same types of weapons to multiple slots it will be randomized which of
+    the slots the weapon will be equipped to, you can also add the same value multiple times
+    to this option in the .yaml to increase the odds of that weapon being selected for that slot
+    """
+    display_name = "Auto Equip Left 1 Slot"
+    valid_keys =DS3WeaponCategory.get_all_categories().keys()
+
+class AutoEquipLeft2(OptionList):
+    """Map which types of weapons can be equipped to Left2
+
+    If you select no values, all weapons can be equipped to this slot
+
+    - **Empty Slot:** If you select this option, all other options will be ignored and no
+      equipment will ever fill this slot
+    - **All * Weapons** These are main categories that have multiple sub categories, you can
+      look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
+    - **Subcategory (Main category)** The subcategory weapons look like this, 
+      ex. Dagger (Straight Blade)
+
+    If you assign the same types of weapons to multiple slots it will be randomized which of
+    the slots the weapon will be equipped to, you can also add the same value multiple times
+    to this option in the .yaml to increase the odds of that weapon being selected for that slot
+    """
+    display_name = "Auto Equip Left 2 Slot"
+    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+
+class AutoEquipLeft3(OptionList):
+    """Map which types of weapons can be equipped to Left3
+
+    If you select no values, all weapons can be equipped to this slot
+
+    - **Empty Slot:** If you select this option, all other options will be ignored and no
+      equipment will ever fill this slot
+    - **All * Weapons** These are main categories that have multiple sub categories, you can
+      look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
+    - **Subcategory (Main category)** The subcategory weapons look like this, 
+      ex. Dagger (Straight Blade)
+
+    If you assign the same types of weapons to multiple slots it will be randomized which of
+    the slots the weapon will be equipped to, you can also add the same value multiple times
+    to this option in the .yaml to increase the odds of that weapon being selected for that slot
+    """
+    display_name = "Auto Equip Left 3 Slot"
+    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+
+class AutoEquipRings(Choice):
+    """Rules for mapping the rings to their slots
+    
+    """
+    display_name = "Ring Slots"
+    option_off = 0
+    option_1 = 1
+    option_2 = 2
+    option_3 = 3
+    option_4 = 4
+    default = option_4
+
+class AutoCursedItems(Choice):
+    """Turn off cursed items
+    
+    """
+    display_name = "Cursed Equipment"
+    option_send_all = 0
+    option_no_cursed_rings = 1
+    option_no_symbol_of_avarice = 2
+    option_no_cursed_items = 3
+    default = option_send_all
 
 
 ## Item Smoothing
@@ -392,6 +529,16 @@ class DarkSouls3Options(PerGameCommonOptions):
     no_weapon_requirements: NoWeaponRequirementsOption
     no_spell_requirements: NoSpellRequirementsOption
 
+    # Auto Equip
+    auto_equip_right1: AutoEquipRight1
+    auto_equip_right2: AutoEquipRight2
+    auto_equip_right3: AutoEquipRight3
+    auto_equip_left1: AutoEquipLeft1
+    auto_equip_left2: AutoEquipLeft2
+    auto_equip_left3: AutoEquipLeft3
+    auto_equip_rings: AutoEquipRings
+    auto_cursed_items: AutoCursedItems
+    
     # Weapons
     randomize_infusion: RandomizeInfusionOption
     randomize_infusion_percentage: RandomizeInfusionPercentageOption
@@ -445,11 +592,21 @@ option_groups = [
     OptionGroup("Equipment", [
         RandomizeStartingLoadout,
         RequireOneHandedStartingWeapons,
-        AutoEquipOption,
-        LockEquipOption,
         NoEquipLoadOption,
         NoWeaponRequirementsOption,
         NoSpellRequirementsOption,
+    ]),
+    OptionGroup("Auto Equip", [
+        AutoEquipOption,
+        LockEquipOption,
+        AutoEquipRight1,
+        AutoEquipRight2,
+        AutoEquipRight3,
+        AutoEquipLeft1,
+        AutoEquipLeft2,
+        AutoEquipLeft3,
+        AutoEquipRings,
+        AutoCursedItems,
     ]),
     OptionGroup("Weapons", [
         RandomizeInfusionOption,

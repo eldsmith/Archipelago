@@ -428,30 +428,21 @@ class DarkSouls3World(World):
             DS3ItemCategory.ARMOR,
             DS3ItemCategory.RING,
         ]):
-            
+            # FIXME: Missing checks for cursed items 
             potential_slots = [
-                [DS3WeaponCategory.M_CLAW,
-                DS3WeaponCategory.M_FIST,
-                DS3WeaponCategory.M_WHIP,
-                DS3WeaponCategory.M_POLEARM,
-                DS3WeaponCategory.M_HAMMER,
-                DS3WeaponCategory.M_AXE,
-                DS3WeaponCategory.M_CURVED_BLADE,
-                DS3WeaponCategory.M_STRAIGHT_BLADE],
-                [DS3WeaponCategory.M_BOW],
-                [],
-                [DS3ItemCategory.SHIELD_INFUSIBLE,DS3ItemCategory.SHIELD],
-                [DS3WeaponCategory.M_CATALYST],
-                [],
+                self.options.auto_equip_right1,
+                self.options.auto_equip_right2,
+                self.options.auto_equip_right3,
+                self.options.auto_equip_left1,
+                self.options.auto_equip_left2,
+                self.options.auto_equip_left3,
             ]
 
             if(data.category == DS3ItemCategory.RING):
                 potential_slots = [
-                    [DS3ItemCategory.RING],
-                    [DS3ItemCategory.RING],
-                    [DS3ItemCategory.RING],
-                    [DS3ItemCategory.RING],
+                    [] for e in range(int(self.options.auto_equip_rings))
                 ]
+                
             data.equip_slot = data.get_equip_slot(potential_slots)
 
         return DarkSouls3Item(self.player, data, classification=classification)
