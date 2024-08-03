@@ -1528,7 +1528,7 @@ class DarkSouls3World(World):
             if item.ap_code is None: continue
             if item.ds3_code and item.equip_slot is not None:
                 equip_slot = item.equip_slot
-                auto_equip_slots[str(item.name)] = equip_slot
+                auto_equip_slots[str(item.ds3_code)] = equip_slot
             if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
             if item.count != 1: item_counts[str(item.ap_code)] = item.count
         
