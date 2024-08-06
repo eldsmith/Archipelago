@@ -426,6 +426,15 @@ class DS3ItemData:
         if(len(potential_slots) == 0):
             return 0  # If no potential rules exist, we return 0, this item will never be equipped
         return choice(potential_slots)
+    
+    def __hash__(self) -> int:
+        return (self.name, self.ds3_code).__hash__()
+    
+    def __eq__(self, other: any) -> bool:
+        if isinstance(other, self.__class__):
+            return self.name == other.name and self.ds3_code == other.ds3_code
+        else:
+            return False
 
 
 class DarkSouls3Item(Item):
