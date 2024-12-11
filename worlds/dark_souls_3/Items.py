@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 import dataclasses
 from enum import IntEnum
-from typing import cast, ClassVar, Dict, Generator, List, Optional, Set, Union
 from random import choice
+from typing import Any, cast, ClassVar, Dict, Generator, List, Optional, Set
 
 from BaseClasses import Item, ItemClassification
 
@@ -147,10 +147,10 @@ class DS3WeaponCategory(IntEnum):
             "All Curved Blade Weapons": DS3WeaponCategory.M_CURVED_BLADE,
             "All Axe Weapons": DS3WeaponCategory.M_AXE,
             "All Hammer Weapons": DS3WeaponCategory.M_HAMMER, 
-            "All Polearm Weapons": DS3WeaponCategory.M_HAMMER, 
-            "All Whip Weapons": DS3WeaponCategory.M_HAMMER, 
-            "All Fist Weapons": DS3WeaponCategory.M_HAMMER, 
-            "All Claw Weapons": DS3WeaponCategory.M_HAMMER, 
+            "All Polearm Weapons": DS3WeaponCategory.M_POLEARM, 
+            "All Whip Weapons": DS3WeaponCategory.M_WHIP, 
+            "All Fist Weapons": DS3WeaponCategory.M_FIST, 
+            "All Claw Weapons": DS3WeaponCategory.M_CLAW, 
             # TODO: Should probably just add shields to DS3WeaponCategory, with their own categories
             # and change the class name to DS3Equippables
             "All Shields": [DS3ItemCategory.SHIELD, DS3ItemCategory.SHIELD_INFUSIBLE], 
@@ -433,11 +433,10 @@ class DS3ItemData:
         if(len(potential_slots) == 0):
             return 0  # If no potential rules exist, we return 0, this item will never be equipped
         return choice(potential_slots)
-    
     def __hash__(self) -> int:
         return (self.name, self.ds3_code).__hash__()
     
-    def __eq__(self, other: any) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
             return self.name == other.name and self.ds3_code == other.ds3_code
         else:

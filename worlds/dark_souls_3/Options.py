@@ -1,10 +1,9 @@
-from copy import deepcopy
 from dataclasses import dataclass
 from .Items import DS3WeaponCategory
 import json
 from typing import Any, Dict
 from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
-  OptionGroup, PerGameCommonOptions, Range, Removed, Toggle, OptionList
+    OptionGroup, PerGameCommonOptions, Range, Removed, Toggle, OptionList
 
 ## Game Options
 
@@ -16,7 +15,6 @@ class EarlySmallLothricBanner(Choice):
     option_early_global = 1
     option_early_local = 2
     default = option_off
-
 
 class LateBasinOfVowsOption(Choice):
     """Guarantee that you don't need to enter Lothric Castle until later in the run.
@@ -450,9 +448,6 @@ class RandomEnemyPresetOption(OptionDict):
     valid_keys = ["Description", "RecommendFullRandomization", "RecommendNoEnemyProgression",
                   "OopsAll", "Boss", "Miniboss", "Basic", "BuffBasicEnemiesAsBosses",
                   "DontRandomize", "RemoveSource", "Enemies"]
-
-    def __init__(self, value: Dict[str, Any]):
-        self.value = deepcopy(value)
 
     @classmethod
     def get_option_name(cls, value: Dict[str, Any]) -> str:
