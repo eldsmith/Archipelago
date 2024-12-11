@@ -3,9 +3,8 @@ from dataclasses import dataclass
 from .Items import DS3WeaponCategory
 import json
 from typing import Any, Dict
-
-from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \ 
-    OptionGroup, PerGameCommonOptions, Range, Removed, Toggle, OptionList
+from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
+  OptionGroup, PerGameCommonOptions, Range, Removed, Toggle, OptionList
 
 ## Game Options
 

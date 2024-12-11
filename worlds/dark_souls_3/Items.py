@@ -390,6 +390,15 @@ class DS3ItemData:
             filler = False,
         )
     
+    @property
+    def is_equippable(self) -> bool:
+         return self.weapon is not None or self.category in [
+            DS3ItemCategory.SHIELD_INFUSIBLE,
+            DS3ItemCategory.SHIELD,
+            DS3ItemCategory.ARMOR,
+            DS3ItemCategory.RING,
+        ]
+
     def get_equip_slot(self, slot_options: List) -> int:
         """Turns a list of slot options into an int representing the items slot value"""
         if(self.category == DS3ItemCategory.ARMOR):
@@ -417,12 +426,10 @@ class DS3ItemData:
                 continue
             if DS3WeaponCategory.NO_EQUIP in current_slot: 
                 continue
-            print(current_slot, self.name)
             potential_slots += [i+1 for e in current_slot
                                 if (self.weapon and (e == self.weapon or e == self.weapon.main_category)) 
                                 or e == self.category ]
         
-        print(potential_slots,self.name)
         if(len(potential_slots) == 0):
             return 0  # If no potential rules exist, we return 0, this item will never be equipped
         return choice(potential_slots)

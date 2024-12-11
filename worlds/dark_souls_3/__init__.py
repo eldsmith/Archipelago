@@ -385,6 +385,7 @@ class DarkSouls3World(World):
     def create_item(self, item: Union[str, DS3ItemData]) -> DarkSouls3Item:
         data = item if isinstance(item, DS3ItemData) else item_dictionary[item]
         classification = None
+
         if self.multiworld and data.useful_if != UsefulIf.DEFAULT and (
             (
                 data.useful_if == UsefulIf.BASE and
@@ -420,30 +421,6 @@ class DarkSouls3World(World):
             infusion_percentage = self.options.randomize_infusion_percentage
             if self.random.randint(0, 99) < infusion_percentage:
                 data = data.infuse(self.random.choice(list(Infusion)))
-        
-
-        if self.options.auto_equip and (data.weapon is not None or data.category in [
-            DS3ItemCategory.SHIELD_INFUSIBLE,
-            DS3ItemCategory.SHIELD,
-            DS3ItemCategory.ARMOR,
-            DS3ItemCategory.RING,
-        ]):
-            # FIXME: Missing checks for cursed items 
-            potential_slots = [
-                self.options.auto_equip_right1,
-                self.options.auto_equip_right2,
-                self.options.auto_equip_right3,
-                self.options.auto_equip_left1,
-                self.options.auto_equip_left2,
-                self.options.auto_equip_left3,
-            ]
-
-            if(data.category == DS3ItemCategory.RING):
-                potential_slots = [
-                    [] for e in range(int(self.options.auto_equip_rings))
-                ]
-                
-            data.equip_slot = data.get_equip_slot(potential_slots)
 
         return DarkSouls3Item(self.player, data, classification=classification)
 
@@ -1470,6 +1447,7 @@ class DarkSouls3World(World):
                     location.item = new_item
                     new_item.location = location
 
+
         if self.options.smooth_upgrade_items:
             base_names = {
                 "Titanite Shard", "Large Titanite Shard", "Titanite Chunk", "Titanite Slab",
@@ -1494,6 +1472,30 @@ class DarkSouls3World(World):
             ]
             upgraded_weapons.sort(key=lambda item: item.level)
             smooth_items(upgraded_weapons)
+
+        if self.options.auto_equip:
+            potential_items = [location.item.data
+             for location in self.multiworld.get_filled_locations()
+             if location.item.code is not None and location.item.player == self.player] + [item for item in item_dictionary.values()]
+            for item in potential_items:
+                if(item.is_equippable):
+                    potential_slots = [
+                        self.options.auto_equip_right1,
+                        self.options.auto_equip_right2,
+                        self.options.auto_equip_right3,
+                        self.options.auto_equip_left1,
+                        self.options.auto_equip_left2,
+                        self.options.auto_equip_left3,
+                    ]
+
+                    if(item.category == DS3ItemCategory.RING):
+                        potential_slots = [
+                            [] for e in range(int(self.options.auto_equip_rings))
+                        ]
+                    
+                    item.equip_slot = item.get_equip_slot(potential_slots)
+                
+        
 
     def _shuffle(self, seq: Sequence) -> List:
         """Returns a shuffled copy of a sequence."""
@@ -1536,10 +1538,10 @@ class DarkSouls3World(World):
         for item in all_items:
             if item.ap_code is None: continue
             if item.ds3_code and item.equip_slot is not None:
-                equip_slot = item.equip_slot
-                auto_equip_slots[str(item.ds3_code)] = equip_slot
-            if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
-            if item.count != 1: item_counts[str(item.ap_code)] = item.count
+                auto_equip_slots[str(item.ds3_code)] = item.equip_slot
+            if item.ap_code not in ap_ids_to_ds3_ids.keys():
+                if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
+                if item.count != 1: item_counts[str(item.ap_code)] = item.count
         
         # A map from Archipelago's location IDs to the keys the static randomizer uses to identify
         # locations.
