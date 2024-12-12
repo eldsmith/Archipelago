@@ -43,7 +43,7 @@ class DS3ItemCategory(IntEnum):
         return None
 
 class DS3WeaponCategory(IntEnum):
-    """Weapon categories in DS3, mainly used for auto equip"""
+    """Weapon categories in DS3, used for auto equip"""
     NO_EQUIP = 50
     
     #Subcategories
@@ -163,7 +163,7 @@ class DS3WeaponCategory(IntEnum):
             "Greatsword (Straight Blade)": DS3WeaponCategory.GREATSWORD,
             "Ultra Greatsword (Straight Blade)": DS3WeaponCategory.ULTRA_GREATSWORD,
             "Curved Sword (Curved Sword)": DS3WeaponCategory.CURVED_SWORD,
-            "Curved  (Curved Sword)": DS3WeaponCategory.CURVED_GREATSWORD,
+            "Curved Greatsword (Curved Sword)": DS3WeaponCategory.CURVED_GREATSWORD,
             "Thrusting Sword (Curved Sword)": DS3WeaponCategory.THRUSTING_SWORD,
             "Katana (Curved Sword)": DS3WeaponCategory.KATANA,
             "Axe (Axe)": DS3WeaponCategory.AXE,
@@ -244,8 +244,8 @@ class DS3ItemData:
     ds3_code: Optional[int]
     category: DS3ItemCategory
     
-    """The assigned equipment slot if auto equip is on"""
     equip_slot: int = None
+    """The assigned equipment slot if auto equip is on"""
 
     base_ds3_code: Optional[int] = None
     """If this is an upgradable weapon, the base ID of the weapon it upgrades from.

@@ -251,8 +251,8 @@ class AutoEquipLeft1(OptionList):
     to this option in the .yaml to increase the odds of that weapon being selected for that slot
     """
     display_name = "Auto Equip Left 1 Slot"
-    valid_keys =DS3WeaponCategory.get_all_categories().keys()
-
+    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+        
 class AutoEquipLeft2(OptionList):
     """Map which types of weapons can be equipped to Left2
 

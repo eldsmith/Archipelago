@@ -309,6 +309,7 @@ class DarkSouls3World(World):
 
             default_item_name = cast(str, location.data.default_item_name)
             item = item_dictionary[default_item_name]
+            item = item_dictionary[location.data.default_item_name]
             if item.skip:
                 num_required_extra_items += 1
             elif not item.unique:
@@ -1477,10 +1478,19 @@ class DarkSouls3World(World):
 
         if self.options.auto_equip:
             potential_items = [location.item.data
-             for location in self.multiworld.get_filled_locations()
-             if location.item.code is not None and location.item.player == self.player] + [item for item in item_dictionary.values()]
+            for location in self.multiworld.get_filled_locations()
+            if location.item.code is not None and location.item.player == self.player] + [item for item in item_dictionary.values()]
             for item in potential_items:
-                if(item.is_equippable):
+                if(not item.is_equippable):
+                   continue
+
+                if(item.base_name == "Calamity Ring" 
+                    and self.options.auto_cursed_items in [1, 3]):
+                    item.equip_slot = 0
+                elif(item.base_name == "Symbol of Avarice"
+                    and self.options.auto_cursed_items in [2, 3]):
+                    item.equip_slot = 0
+                else:
                     potential_slots = [
                         self.options.auto_equip_right1,
                         self.options.auto_equip_right2,
@@ -1494,9 +1504,9 @@ class DarkSouls3World(World):
                         potential_slots = [
                             [] for e in range(int(self.options.auto_equip_rings))
                         ]
-                    
-                    item.equip_slot = item.get_equip_slot(potential_slots)
                 
+                    item.equip_slot = item.get_equip_slot(potential_slots)
+            
         
 
     def _shuffle(self, seq: Sequence) -> List:
@@ -1543,7 +1553,7 @@ class DarkSouls3World(World):
         for item in all_items:
             if item.ap_code is None: continue
             if item.ds3_code and item.equip_slot is not None:
-                auto_equip_slots[str(item.ds3_code)] = item.equip_slot
+                auto_equip_slots[str(item.base_ds3_code)] = item.equip_slot
             if item.ap_code not in ap_ids_to_ds3_ids.keys():
                 if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
                 if item.count != 1: item_counts[str(item.ap_code)] = item.count
