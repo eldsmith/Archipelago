@@ -42,37 +42,38 @@ class DS3ItemCategory(IntEnum):
 
         return None
 
+
 class DS3WeaponCategory(IntEnum):
     """Weapon categories in DS3, used for auto equip"""
-    NO_EQUIP = 50
+    NO_EQUIP = 0
     
     #Subcategories
-    DAGGER = 51
-    STRAIGHT_SWORD = 52
-    GREATSWORD = 53
-    ULTRA_GREATSWORD = 54
-    CURVED_SWORD = 55
-    CURVED_GREATSWORD = 56
-    THRUSTING_SWORD = 57
-    KATANA = 58
-    AXE = 59
-    GREATAXE = 60
-    HAMMER = 61
-    GREAT_HAMMER = 62
-    SPEAR = 63
-    HALBEARD = 64
-    PIKE = 65
-    REAPER = 66
-    WHIP = 67
-    FIST = 68
-    CLAW = 69
-    BOW = 70
-    GREATBOW = 71
-    CROSSBOW = 72
-    STAFF = 73
-    TALISMAN = 74
-    PYROMANCY_FLAME = 75
-    SACRED_CHIME = 76
+    DAGGER = 1
+    STRAIGHT_SWORD = 2
+    GREATSWORD = 3
+    ULTRA_GREATSWORD = 4
+    CURVED_SWORD = 5
+    CURVED_GREATSWORD = 6
+    THRUSTING_SWORD = 7
+    KATANA = 8
+    AXE = 9
+    GREATAXE = 10
+    HAMMER = 11
+    GREAT_HAMMER = 12
+    SPEAR = 13
+    HALBEARD = 14
+    PIKE = 15
+    REAPER = 16
+    WHIP = 17
+    FIST = 18
+    CLAW = 19
+    BOW = 20
+    GREATBOW = 21
+    CROSSBOW = 22
+    STAFF = 23
+    TALISMAN = 24
+    PYROMANCY_FLAME = 25
+    SACRED_CHIME = 26
 
     #Main Categories
     M_STRAIGHT_BLADE = 100
@@ -140,17 +141,17 @@ class DS3WeaponCategory(IntEnum):
                 DS3WeaponCategory.M_FIST,
                 DS3WeaponCategory.M_CLAW,
             ],
-            "All Ranged Weapons": DS3WeaponCategory.M_BOW,
+            "All Bows": DS3WeaponCategory.M_BOW,
             "All Catalysts": DS3WeaponCategory.M_CATALYST,
 
-            "All Straight Blade Weapons": DS3WeaponCategory.M_STRAIGHT_BLADE,
-            "All Curved Blade Weapons": DS3WeaponCategory.M_CURVED_BLADE,
-            "All Axe Weapons": DS3WeaponCategory.M_AXE,
-            "All Hammer Weapons": DS3WeaponCategory.M_HAMMER, 
-            "All Polearm Weapons": DS3WeaponCategory.M_POLEARM, 
-            "All Whip Weapons": DS3WeaponCategory.M_WHIP, 
-            "All Fist Weapons": DS3WeaponCategory.M_FIST, 
-            "All Claw Weapons": DS3WeaponCategory.M_CLAW, 
+            "All Straight Blades": DS3WeaponCategory.M_STRAIGHT_BLADE,
+            "All Curved Blades": DS3WeaponCategory.M_CURVED_BLADE,
+            "All Axes": DS3WeaponCategory.M_AXE,
+            "All Hammers": DS3WeaponCategory.M_HAMMER, 
+            "All Polearms": DS3WeaponCategory.M_POLEARM, 
+            "All Whips": DS3WeaponCategory.M_WHIP, 
+            "All Fists": DS3WeaponCategory.M_FIST, 
+            "All Claws": DS3WeaponCategory.M_CLAW, 
             # TODO: Should probably just add shields to DS3WeaponCategory, with their own categories
             # and change the class name to DS3Equippables
             "All Shields": [DS3ItemCategory.SHIELD, DS3ItemCategory.SHIELD_INFUSIBLE], 
@@ -158,34 +159,34 @@ class DS3WeaponCategory(IntEnum):
             # Some main categories are single category so the subcategories are technically repeating, this is done 
             # intentionally in case of user confusion believing that perhaps single category subcategories belong 
             # to another main category and thus could be accidentally omitted
-            "Dagger (Straight Blade)": DS3WeaponCategory.DAGGER,
-            "Straight Sword (Straight Blade)": DS3WeaponCategory.STRAIGHT_SWORD,
-            "Greatsword (Straight Blade)": DS3WeaponCategory.GREATSWORD,
-            "Ultra Greatsword (Straight Blade)": DS3WeaponCategory.ULTRA_GREATSWORD,
-            "Curved Sword (Curved Sword)": DS3WeaponCategory.CURVED_SWORD,
-            "Curved Greatsword (Curved Sword)": DS3WeaponCategory.CURVED_GREATSWORD,
-            "Thrusting Sword (Curved Sword)": DS3WeaponCategory.THRUSTING_SWORD,
-            "Katana (Curved Sword)": DS3WeaponCategory.KATANA,
-            "Axe (Axe)": DS3WeaponCategory.AXE,
-            "Greataxe (Axe)": DS3WeaponCategory.GREATAXE,
-            "Hammer (Hammer)": DS3WeaponCategory.HAMMER,
-            "Great Hammer (Hammer)": DS3WeaponCategory.GREAT_HAMMER,
-            "Spear (Polearm)": DS3WeaponCategory.SPEAR,
-            "Halberd (Polearm)": DS3WeaponCategory.HALBEARD,
-            "Pike (Polearm)": DS3WeaponCategory.PIKE,
-            "Reaper (Polearm)": DS3WeaponCategory.REAPER,
-            "Whip (Whip)": DS3WeaponCategory.WHIP,
-            "Fist (Fist)": DS3WeaponCategory.FIST,
-            "Claw (Claw)": DS3WeaponCategory.CLAW,
-            "Bow (Bow)": DS3WeaponCategory.BOW,
-            "Greatbow (Bow)": DS3WeaponCategory.GREATBOW,
-            "Crossbow (Bow)": DS3WeaponCategory.CROSSBOW,
-            "Staff (Catalyst)": DS3WeaponCategory.STAFF,
-            "Talisman (Catalyst)": DS3WeaponCategory.TALISMAN,
-            "Pyromancy Flame (Catalyst)": DS3WeaponCategory.PYROMANCY_FLAME,
-            "Sacred Chime (Catalyst)": DS3WeaponCategory.SACRED_CHIME,
+            "Dagger": DS3WeaponCategory.DAGGER,
+            "Straight Sword": DS3WeaponCategory.STRAIGHT_SWORD,
+            "Greatsword": DS3WeaponCategory.GREATSWORD,
+            "Ultra Greatsword": DS3WeaponCategory.ULTRA_GREATSWORD,
+            "Curved Sword": DS3WeaponCategory.CURVED_SWORD,
+            "Curved Greatsword": DS3WeaponCategory.CURVED_GREATSWORD,
+            "Thrusting Sword": DS3WeaponCategory.THRUSTING_SWORD,
+            "Katana": DS3WeaponCategory.KATANA,
+            "Axe": DS3WeaponCategory.AXE,
+            "Greataxe": DS3WeaponCategory.GREATAXE,
+            "Hammer": DS3WeaponCategory.HAMMER,
+            "Great Hammer": DS3WeaponCategory.GREAT_HAMMER,
+            "Spear": DS3WeaponCategory.SPEAR,
+            "Halberd": DS3WeaponCategory.HALBEARD,
+            "Pike": DS3WeaponCategory.PIKE,
+            "Reaper": DS3WeaponCategory.REAPER,
+            "Whip": DS3WeaponCategory.WHIP,
+            "Fist": DS3WeaponCategory.FIST,
+            "Claw": DS3WeaponCategory.CLAW,
+            "Bow": DS3WeaponCategory.BOW,
+            "Greatbow": DS3WeaponCategory.GREATBOW,
+            "Crossbow": DS3WeaponCategory.CROSSBOW,
+            "Staff": DS3WeaponCategory.STAFF,
+            "Talisman": DS3WeaponCategory.TALISMAN,
+            "Pyromancy Flame": DS3WeaponCategory.PYROMANCY_FLAME,
+            "Sacred Chime": DS3WeaponCategory.SACRED_CHIME,
         }
-    
+
 @dataclass
 class Infusion(IntEnum):
     """Infusions supported by Dark Souls III.
