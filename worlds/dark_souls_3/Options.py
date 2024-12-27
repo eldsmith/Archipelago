@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .Items import DS3WeaponCategory
+from .Items import DS3EquipCategory
 import json
 from typing import Any, Dict
 from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
@@ -183,7 +183,7 @@ class AutoEquipRight1(OptionList):
 
     If you select no values, all weapons can be equipped to this slot (aside from shields)
 
-    - **Empty Slot:** If you select this option, all other options will be ignored and no
+    - **No Equipment:** If you select this option, all other options will be ignored and no
       equipment will ever fill this slot
     - **All * Weapons** These are main categories that have multiple sub categories, you can
       look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
@@ -195,7 +195,7 @@ class AutoEquipRight1(OptionList):
     to this option in the .yaml to increase the odds of that weapon being selected for that slot
     """
     display_name = "Auto Equip Right 1 Slot"
-    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+    valid_keys = DS3EquipCategory.get_all_categories().keys()
 
 
 class AutoEquipRight2(OptionList):
@@ -215,7 +215,7 @@ class AutoEquipRight2(OptionList):
     to this option in the .yaml to increase the odds of that weapon being selected for that slot
     """
     display_name = "Auto Equip Right 2 Slot"
-    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+    valid_keys = DS3EquipCategory.get_all_categories().keys()
 
 
 class AutoEquipRight3(OptionList):
@@ -223,7 +223,7 @@ class AutoEquipRight3(OptionList):
 
     If you select no values, all weapons can be equipped to this slot (aside from shields)
 
-    - **Empty Slot:** If you select this option, all other options will be ignored and no
+    - **No Equipment:** If you select this option, all other options will be ignored and no
       equipment will ever fill this slot
     - **All * Weapons** These are main categories that have multiple sub categories, you can
       look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
@@ -235,7 +235,7 @@ class AutoEquipRight3(OptionList):
     to this option in the .yaml to increase the odds of that weapon being selected for that slot
     """
     display_name = "Auto Equip Right 3 Slot"
-    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+    valid_keys = DS3EquipCategory.get_all_categories().keys()
 
 
 class AutoEquipLeft1(OptionList):
@@ -243,7 +243,7 @@ class AutoEquipLeft1(OptionList):
 
     If you select no values, all weapons can be equipped to this slot
 
-    - **Empty Slot:** If you select this option, all other options will be ignored and no
+    - **No Equipment:** If you select this option, all other options will be ignored and no
       equipment will ever fill this slot
     - **All * Weapons** These are main categories that have multiple sub categories, you can
       look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
@@ -255,7 +255,7 @@ class AutoEquipLeft1(OptionList):
     to this option in the .yaml to increase the odds of that weapon being selected for that slot
     """
     display_name = "Auto Equip Left 1 Slot"
-    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+    valid_keys = DS3EquipCategory.get_all_categories().keys()
 
        
 class AutoEquipLeft2(OptionList):
@@ -263,7 +263,7 @@ class AutoEquipLeft2(OptionList):
 
     If you select no values, all weapons can be equipped to this slot
 
-    - **Empty Slot:** If you select this option, all other options will be ignored and no
+    - **No Equipment:** If you select this option, all other options will be ignored and no
       equipment will ever fill this slot
     - **All * Weapons** These are main categories that have multiple sub categories, you can
       look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
@@ -275,7 +275,7 @@ class AutoEquipLeft2(OptionList):
     to this option in the .yaml to increase the odds of that weapon being selected for that slot
     """
     display_name = "Auto Equip Left 2 Slot"
-    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+    valid_keys = DS3EquipCategory.get_all_categories().keys()
 
 
 class AutoEquipLeft3(OptionList):
@@ -283,7 +283,7 @@ class AutoEquipLeft3(OptionList):
 
     If you select no values, all weapons can be equipped to this slot
 
-    - **Empty Slot:** If you select this option, all other options will be ignored and no
+    - **No Equipment:** If you select this option, all other options will be ignored and no
       equipment will ever fill this slot
     - **All * Weapons** These are main categories that have multiple sub categories, you can
       look these up on https://darksouls.fandom.com/wiki/Weapons_(Dark_Souls_III)
@@ -295,7 +295,7 @@ class AutoEquipLeft3(OptionList):
     to this option in the .yaml to increase the odds of that weapon being selected for that slot
     """
     display_name = "Auto Equip Left 3 Slot"
-    valid_keys = DS3WeaponCategory.get_all_categories().keys()
+    valid_keys = DS3EquipCategory.get_all_categories().keys()
 
 
 class AutoEquipRings(Choice):
