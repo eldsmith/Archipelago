@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from .Items import DS3EquipCategory
 import json
 from typing import Any, Dict
+
 from Options import Choice, DeathLink, DefaultOnToggle, ExcludeLocations, NamedRange, OptionDict, \
     OptionGroup, PerGameCommonOptions, Range, Removed, Toggle, OptionList
 
@@ -321,8 +322,6 @@ class AutoCursedItems(Choice):
     option_no_symbol_of_avarice = 2
     option_no_cursed_items = 3
     default = option_send_all
-
-
 ## Item Smoothing
 
 class SmoothSoulItemsOption(DefaultOnToggle):

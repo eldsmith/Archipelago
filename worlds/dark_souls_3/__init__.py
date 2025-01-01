@@ -309,7 +309,6 @@ class DarkSouls3World(World):
 
             default_item_name = cast(str, location.data.default_item_name)
             item = item_dictionary[default_item_name]
-            item = item_dictionary[location.data.default_item_name]
             if item.skip:
                 num_required_extra_items += 1
             elif not item.unique:
@@ -388,7 +387,6 @@ class DarkSouls3World(World):
     def create_item(self, item: Union[str, DS3ItemData]) -> DarkSouls3Item:
         data = item if isinstance(item, DS3ItemData) else item_dictionary[item]
         classification = None
-
         if self.multiworld and data.useful_if != UsefulIf.DEFAULT and (
             (
                 data.useful_if == UsefulIf.BASE and
@@ -1450,7 +1448,6 @@ class DarkSouls3World(World):
                     location.item = new_item
                     new_item.location = location
 
-
         if self.options.smooth_upgrade_items:
             base_names = {
                 "Titanite Shard", "Large Titanite Shard", "Titanite Chunk", "Titanite Slab",
@@ -1540,24 +1537,26 @@ class DarkSouls3World(World):
         # We include all the items the game knows about so that users can manually request items
         # that aren't randomized, and then we _also_ include all the items that are placed in
         # practice `item_dictionary.values()` doesn't include upgraded or infused weapons.
-        all_items = {
-            cast(DarkSouls3Item, location.item).data
+        items_by_name = {
+            location.item.name: cast(DarkSouls3Item, location.item).data
             for location in self.multiworld.get_filled_locations()
             # item.code None is used for events, which we want to skip
             if location.item.code is not None and location.item.player == self.player
-        }.union(item_dictionary.values())
+        }
+        for item in item_dictionary.values():
+            if item.name not in items_by_name:
+                items_by_name[item.name] = item
 
         ap_ids_to_ds3_ids: Dict[str, int] = {}
         item_counts: Dict[str, int] = {}
         auto_equip_slots: Dict[str, int] = {}
-        for item in all_items:
+        for item in items_by_name.values():
             if item.ap_code is None: continue
+            if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
+            if item.count != 1: item_counts[str(item.ap_code)] = item.count
             if item.ds3_code and item.equip_slot is not None:
                 auto_equip_slots[str(item.base_ds3_code)] = item.equip_slot
-            if item.ap_code not in ap_ids_to_ds3_ids.keys():
-                if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
-                if item.count != 1: item_counts[str(item.ap_code)] = item.count
-        
+
         # A map from Archipelago's location IDs to the keys the static randomizer uses to identify
         # locations.
         location_ids_to_keys: Dict[int, str] = {}

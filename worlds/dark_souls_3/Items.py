@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import dataclasses
 from enum import IntEnum
-from random import choice
 from typing import Any, cast, ClassVar, Dict, Generator, List, Optional, Set
 
 from BaseClasses import Item, ItemClassification
@@ -449,6 +448,146 @@ class DS3ItemData:
             return self.name == other.name and self.ds3_code == other.ds3_code
         else:
             return False
+
+    base_ds3_code: Optional[int] = None
+    """If this is an upgradable weapon, the base ID of the weapon it upgrades from.
+
+    Otherwise, or if the weapon isn't upgraded, this is the same as ds3_code.
+    """
+
+    base_name: Optional[str] = None
+    """The name of the individual item, if this is a multi-item group."""
+
+    classification: ItemClassification = ItemClassification.filler
+    """How important this item is to the game progression."""
+
+    ap_code: Optional[int] = None
+    """The Archipelago ID for this item."""
+
+    is_dlc: bool = False
+    """Whether this item is only found in one of the two DLC packs."""
+
+    count: int = 1
+    """The number of copies of this item included in each drop."""
+
+    inject: bool = False
+    """If this is set, the randomizer will try to inject this item into the game.
+
+    This is used for items such as covenant rewards that aren't realistically reachable in a
+    randomizer run, but are still fun to have available to the player. If there are more locations
+    available than there are items in the item pool, these items will be used to help make up the
+    difference.
+    """
+
+    souls: Optional[int] = None
+    """If this is a consumable item that gives souls, the number of souls it gives."""
+
+    useful_if: UsefulIf = UsefulIf.DEFAULT
+    """Whether and when this item should be marked as "useful"."""
+
+    filler: bool = False
+    """Whether this is a candidate for a filler item to be added to fill out extra locations."""
+
+    skip: bool = False
+    """Whether to omit this item from randomization and replace it with filler or unique items."""
+
+    @property
+    def unique(self):
+        """Whether this item should be unique, appearing only once in the randomizer."""
+        return self.category not in {
+            DS3ItemCategory.MISC, DS3ItemCategory.SOUL, DS3ItemCategory.UPGRADE,
+            DS3ItemCategory.HEALING,
+        }
+
+    def __post_init__(self):
+        self.ap_code = self.ap_code or DS3ItemData.__item_id
+        if not self.base_name: self.base_name = self.name
+        if not self.base_ds3_code: self.base_ds3_code = self.ds3_code
+        DS3ItemData.__item_id += 1
+
+    def item_groups(self) -> List[str]:
+        """The names of item groups this item should appear in.
+
+        This is computed from the properties assigned to this item."""
+        names = []
+        if self.classification == ItemClassification.progression: names.append("Progression")
+        if self.name.startswith("Cinders of a Lord -"): names.append("Cinders")
+
+        names.append({
+            DS3ItemCategory.WEAPON_UPGRADE_5: "Weapons",
+            DS3ItemCategory.WEAPON_UPGRADE_10: "Weapons",
+            DS3ItemCategory.WEAPON_UPGRADE_10_INFUSIBLE: "Weapons",
+            DS3ItemCategory.SHIELD: "Shields",
+            DS3ItemCategory.SHIELD_INFUSIBLE: "Shields",
+            DS3ItemCategory.ARMOR: "Armor",
+            DS3ItemCategory.RING: "Rings",
+            DS3ItemCategory.SPELL: "Spells",
+            DS3ItemCategory.MISC: "Miscellaneous",
+            DS3ItemCategory.UNIQUE: "Unique",
+            DS3ItemCategory.BOSS: "Boss Souls",
+            DS3ItemCategory.SOUL: "Small Souls",
+            DS3ItemCategory.UPGRADE: "Upgrade",
+            DS3ItemCategory.HEALING: "Healing",
+        }[self.category])
+
+        return names
+
+    def counts(self, counts: List[int]) -> Generator["DS3ItemData", None, None]:
+        """Returns an iterable of copies of this item with the given counts."""
+        yield self
+        for count in counts:
+            yield dataclasses.replace(
+                self,
+                ap_code = None,
+                name = "{} x{}".format(self.base_name, count),
+                base_name = self.base_name,
+                count = count,
+                filler = False, # Don't count multiples as filler by default
+            )
+
+    @property
+    def is_infused(self) -> bool:
+        """Returns whether this item is an infused weapon."""
+        return cast(int, self.ds3_code) - cast(int, self.base_ds3_code) >= 100
+
+    def infuse(self, infusion: Infusion) -> "DS3ItemData":
+        """Returns this item with the given infusion applied."""
+        if not self.category.is_infusible: raise RuntimeError(f"{self.name} is not infusible.")
+        if self.is_infused:
+            raise RuntimeError(f"{self.name} is already infused.")
+
+        # We can't change the name or AP code when infusing/upgrading weapons, because they both
+        # need to match what's in item_name_to_id. We don't want to add every possible
+        # infusion/upgrade combination to that map because it's way too many items.
+        return dataclasses.replace(
+            self,
+            name = self.name,
+            ds3_code = cast(int, self.ds3_code) + infusion.value,
+            filler = False,
+        )
+
+    @property
+    def is_upgraded(self) -> bool:
+        """Returns whether this item is a weapon that's upgraded beyond level 0."""
+        return (cast(int, self.ds3_code) - cast(int, self.base_ds3_code)) % 100 != 0
+
+    def upgrade(self, level: int) -> "DS3ItemData":
+        """Upgrades this item to the given level."""
+        if not self.category.upgrade_level: raise RuntimeError(f"{self.name} is not upgradable.")
+        if level > self.category.upgrade_level:
+            raise RuntimeError(f"{self.name} can't be upgraded to +{level}.")
+        if self.is_upgraded:
+            raise RuntimeError(f"{self.name} is already upgraded.")
+
+        # We can't change the name or AP code when infusing/upgrading weapons, because they both
+        # need to match what's in item_name_to_id. We don't want to add every possible
+        # infusion/upgrade combination to that map because it's way too many items.
+        return dataclasses.replace(
+            self,
+            name = self.name,
+            ds3_code = cast(int, self.ds3_code) + level,
+            filler = False,
+        )
 
 
 class DarkSouls3Item(Item):
