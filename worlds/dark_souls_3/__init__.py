@@ -11,7 +11,7 @@ from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import CollectionRule, ItemRule, add_rule, add_item_rule
 
 from .Bosses import DS3BossInfo, all_bosses, default_yhorm_location
-from .Items import DarkSouls3Item, DS3ItemData, DS3ItemCategory, Infusion, UsefulIf, filler_item_names, item_descriptions, item_dictionary, item_name_groups
+from .Items import DS3EquipCategory, DarkSouls3Item, DS3ItemData, DS3ItemCategory, Infusion, UsefulIf, filler_item_names, item_descriptions, item_dictionary, item_name_groups
 from .Locations import DarkSouls3Location, DS3LocationData, location_tables, location_descriptions, location_dictionary, location_name_groups, region_order
 from .Options import DarkSouls3Options, option_groups
 
@@ -1473,39 +1473,6 @@ class DarkSouls3World(World):
             upgraded_weapons.sort(key=lambda item: item.level)
             smooth_items(upgraded_weapons)
 
-        if self.options.auto_equip:
-            potential_items = [location.item.data
-            for location in self.multiworld.get_filled_locations()
-            if location.item.code is not None and location.item.player == self.player] + [item for item in item_dictionary.values()]
-            for item in potential_items:
-                if(not item.is_equippable):
-                   continue
-
-                if(item.base_name == "Calamity Ring" 
-                    and self.options.auto_cursed_items in [1, 3]):
-                    item.equip_slot = 0
-                elif(item.base_name == "Symbol of Avarice"
-                    and self.options.auto_cursed_items in [2, 3]):
-                    item.equip_slot = 0
-                else:
-                    potential_slots = [
-                        self.options.auto_equip_right1,
-                        self.options.auto_equip_right2,
-                        self.options.auto_equip_right3,
-                        self.options.auto_equip_left1,
-                        self.options.auto_equip_left2,
-                        self.options.auto_equip_left3,
-                    ]
-
-                    if(item.category == DS3ItemCategory.RING):
-                        potential_slots = [
-                            [] for e in range(int(self.options.auto_equip_rings))
-                        ]
-                
-                    item.equip_slot = item.get_equip_slot(potential_slots)
-            
-        
-
     def _shuffle(self, seq: Sequence) -> List:
         """Returns a shuffled copy of a sequence."""
         copy = list(seq)
@@ -1537,6 +1504,7 @@ class DarkSouls3World(World):
         # We include all the items the game knows about so that users can manually request items
         # that aren't randomized, and then we _also_ include all the items that are placed in
         # practice `item_dictionary.values()` doesn't include upgraded or infused weapons.
+
         items_by_name = {
             location.item.name: cast(DarkSouls3Item, location.item).data
             for location in self.multiworld.get_filled_locations()
@@ -1549,13 +1517,55 @@ class DarkSouls3World(World):
 
         ap_ids_to_ds3_ids: Dict[str, int] = {}
         item_counts: Dict[str, int] = {}
-        auto_equip_slots: Dict[str, int] = {}
         for item in items_by_name.values():
             if item.ap_code is None: continue
             if item.ds3_code: ap_ids_to_ds3_ids[str(item.ap_code)] = item.ds3_code
             if item.count != 1: item_counts[str(item.ap_code)] = item.count
-            if item.ds3_code and item.equip_slot is not None:
-                auto_equip_slots[str(item.base_ds3_code)] = item.equip_slot
+        
+        #Map base items in the game to auto equip slots which are then added to slot data
+        auto_equip_slots: Dict[str, int] = {}
+        if self.options.auto_equip:
+
+            ##Create Auto Equip rules
+            auto_equip_options = (
+                self.options.auto_equip_right1,
+                self.options.auto_equip_right2,
+                self.options.auto_equip_right3,
+                self.options.auto_equip_left1,
+                self.options.auto_equip_left2,
+                self.options.auto_equip_left3
+            )
+
+            auto_equip_rules = (
+                [],[],[],[],[],[]
+            )
+
+            for i, rules in enumerate(auto_equip_options):
+                categories = DS3EquipCategory.get_all_categories()
+                for rule in rules.value: auto_equip_rules[i].extend(categories[rule])
+            
+            potential_items = [item for item in item_dictionary.values()]
+            for item in potential_items:
+                if not item.is_equippable:
+                   continue
+
+                equip_slot: int = 0
+                potential_slots: List[int] = []
+
+                if item.base_name == "Calamity Ring" and self.options.auto_cursed_items in [1, 3]:
+                    continue
+                elif item.base_name == "Symbol of Avarice"and self.options.auto_cursed_items in [2, 3]:
+                    continue
+                else:
+                    if item.category == DS3ItemCategory.RING and self.options.auto_equip_rings > 0:
+                        equip_slot = self.random.randint(1, int(self.options.auto_equip_rings))
+                    elif item.category == DS3ItemCategory.ARMOR: equip_slot = 10
+                    elif item.equip:
+                        for i, equip in enumerate(auto_equip_rules):
+                            if item.equip in equip: potential_slots.extend([i + 1] * equip.count(equip_slot))
+                        if len(potential_slots) > 0:
+                            equip_slot = self.random.choice(potential_slots)
+                auto_equip_slots[str(item.base_ds3_code)] = equip_slot
 
         # A map from Archipelago's location IDs to the keys the static randomizer uses to identify
         # locations.
@@ -1602,6 +1612,7 @@ class DarkSouls3World(World):
             "autoEquipSlots": auto_equip_slots,
             "itemCounts": item_counts,
             "locationIdsToKeys": location_ids_to_keys,
+            "versions": ">=3.0.0-beta.24 <3.1.0",
         }
 
         return slot_data

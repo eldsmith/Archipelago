@@ -43,7 +43,7 @@ class DS3ItemCategory(IntEnum):
 
 
 class DS3EquipCategory(IntEnum):
-    """Weapon categories in DS3, used for auto equip"""
+    """Equip categories in DS3, used for auto equip"""
     NO_EQUIP = 0
     
     #Subcategories
@@ -91,53 +91,70 @@ class DS3EquipCategory(IntEnum):
     M_SHIELD = 1100
 
     @property
-    def main_category(self) -> IntEnum:
-        """Returns the main equip category"""
-        if not self.is_subcategory:
-            return self
-        
-        return {
-            DS3EquipCategory.DAGGER:            DS3EquipCategory.M_STRAIGHT_BLADE,
-            DS3EquipCategory.STRAIGHT_SWORD:    DS3EquipCategory.M_STRAIGHT_BLADE,
-            DS3EquipCategory.GREATSWORD:        DS3EquipCategory.M_STRAIGHT_BLADE,
-            DS3EquipCategory.ULTRA_GREATSWORD:  DS3EquipCategory.M_STRAIGHT_BLADE,
-            DS3EquipCategory.CURVED_SWORD:      DS3EquipCategory.M_CURVED_BLADE,
-            DS3EquipCategory.CURVED_GREATSWORD: DS3EquipCategory.M_CURVED_BLADE,
-            DS3EquipCategory.THRUSTING_SWORD:   DS3EquipCategory.M_CURVED_BLADE,
-            DS3EquipCategory.KATANA:            DS3EquipCategory.M_CURVED_BLADE,
-            DS3EquipCategory.AXE:               DS3EquipCategory.M_AXE,
-            DS3EquipCategory.GREATAXE:          DS3EquipCategory.M_AXE,
-            DS3EquipCategory.HAMMER:            DS3EquipCategory.M_HAMMER,
-            DS3EquipCategory.GREAT_HAMMER:      DS3EquipCategory.M_HAMMER,
-            DS3EquipCategory.SPEAR:             DS3EquipCategory.M_POLEARM,
-            DS3EquipCategory.HALBEARD:          DS3EquipCategory.M_POLEARM,
-            DS3EquipCategory.PIKE:              DS3EquipCategory.M_POLEARM,
-            DS3EquipCategory.REAPER:            DS3EquipCategory.M_POLEARM,
-            DS3EquipCategory.WHIP:              DS3EquipCategory.M_WHIP,
-            DS3EquipCategory.FIST:              DS3EquipCategory.M_FIST,
-            DS3EquipCategory.CLAW:              DS3EquipCategory.M_CLAW,
-            DS3EquipCategory.BOW:               DS3EquipCategory.M_BOW,
-            DS3EquipCategory.GREATBOW:          DS3EquipCategory.M_BOW,
-            DS3EquipCategory.CROSSBOW:          DS3EquipCategory.M_BOW,
-            DS3EquipCategory.STAFF:             DS3EquipCategory.M_CATALYST,
-            DS3EquipCategory.TALISMAN:          DS3EquipCategory.M_CATALYST,
-            DS3EquipCategory.PYROMANCY_FLAME:   DS3EquipCategory.M_CATALYST,
-            DS3EquipCategory.SACRED_CHIME:      DS3EquipCategory.M_CATALYST,
-            DS3EquipCategory.STANDARD_SHIELD:   DS3EquipCategory.M_SHIELD,
-            DS3EquipCategory.SMALL_SHIELD:      DS3EquipCategory.M_SHIELD,
-            DS3EquipCategory.GREATSHIELD:       DS3EquipCategory.M_SHIELD,
-        }[self]
-    
-    @property
     def is_subcategory(self) -> bool:
         """Returns true if this category is a subcategory"""
         return self < 100
     
+    @property
+    def subcategories(self) -> List[IntEnum]:
+        """Returns the subcategories"""
+        if self.is_subcategory:
+            return [self]
+
+        return {
+            DS3EquipCategory.M_STRAIGHT_BLADE:[
+                DS3EquipCategory.DAGGER,
+                DS3EquipCategory.STRAIGHT_SWORD,
+                DS3EquipCategory.GREATSWORD,
+                DS3EquipCategory.ULTRA_GREATSWORD,
+            ],
+            DS3EquipCategory.M_CURVED_BLADE:[
+                DS3EquipCategory.CURVED_SWORD,
+                DS3EquipCategory.CURVED_GREATSWORD,
+                DS3EquipCategory.THRUSTING_SWORD,
+                DS3EquipCategory.KATANA,
+            ],
+            DS3EquipCategory.M_AXE:[
+                DS3EquipCategory.AXE,
+                DS3EquipCategory.GREATAXE,
+            ],
+            DS3EquipCategory.M_HAMMER:[
+                DS3EquipCategory.HAMMER,
+                DS3EquipCategory.GREAT_HAMMER,
+            ],
+            DS3EquipCategory.M_POLEARM:[
+                DS3EquipCategory.SPEAR,
+                DS3EquipCategory.HALBEARD,
+                DS3EquipCategory.PIKE,
+                DS3EquipCategory.REAPER,
+            ],
+            DS3EquipCategory.M_WHIP:[DS3EquipCategory.WHIP],
+            DS3EquipCategory.M_FIST:[DS3EquipCategory.FIST],
+            DS3EquipCategory.M_CLAW:[DS3EquipCategory.CLAW],
+            DS3EquipCategory.M_BOW:[
+                DS3EquipCategory.BOW,
+                DS3EquipCategory.GREATBOW,
+                DS3EquipCategory.CROSSBOW,
+            ],
+            DS3EquipCategory.M_CATALYST:[
+                DS3EquipCategory.STAFF,
+                DS3EquipCategory.TALISMAN,
+                DS3EquipCategory.PYROMANCY_FLAME,
+                DS3EquipCategory.SACRED_CHIME,
+            ],
+            DS3EquipCategory.M_SHIELD:[
+                DS3EquipCategory.STANDARD_SHIELD,
+                DS3EquipCategory.SMALL_SHIELD,
+                DS3EquipCategory.GREATSHIELD,
+            ]
+        }[self]
+
     @staticmethod
     def get_all_categories() -> dict:
+        """Returns the key value pairs used to map options to categories"""
         return {
-            "No Equipment" : DS3EquipCategory.NO_EQUIP,
-            "All Melee Weapons": [
+            "No Equipment" : DS3EquipCategory.NO_EQUIP.subcategories,
+            "All Melee Weapons": mix_categories([
                 DS3EquipCategory.M_STRAIGHT_BLADE,
                 DS3EquipCategory.M_CURVED_BLADE,
                 DS3EquipCategory.M_AXE,
@@ -146,53 +163,62 @@ class DS3EquipCategory(IntEnum):
                 DS3EquipCategory.M_WHIP,
                 DS3EquipCategory.M_FIST,
                 DS3EquipCategory.M_CLAW,
-            ],
-            "All Bows": DS3EquipCategory.M_BOW,
-            "All Catalysts": DS3EquipCategory.M_CATALYST,
-
-            "All Straight Blades": DS3EquipCategory.M_STRAIGHT_BLADE,
-            "All Curved Blades": DS3EquipCategory.M_CURVED_BLADE,
-            "All Axes": DS3EquipCategory.M_AXE,
-            "All Hammers": DS3EquipCategory.M_HAMMER, 
-            "All Polearms": DS3EquipCategory.M_POLEARM, 
-            "All Whips": DS3EquipCategory.M_WHIP, 
-            "All Fists": DS3EquipCategory.M_FIST, 
-            "All Claws": DS3EquipCategory.M_CLAW, 
-            "All Shields": DS3EquipCategory.M_SHIELD,
+            ]),
+            "All Bows": DS3EquipCategory.M_BOW.subcategories,
+            "All Catalysts": DS3EquipCategory.M_CATALYST.subcategories,
+            "All Straight Blades": DS3EquipCategory.M_STRAIGHT_BLADE.subcategories,
+            "All Curved Blades": DS3EquipCategory.M_CURVED_BLADE.subcategories,
+            "All Axes": DS3EquipCategory.M_AXE.subcategories,
+            "All Hammers": DS3EquipCategory.M_HAMMER.subcategories,
+            "All Polearms": DS3EquipCategory.M_POLEARM.subcategories,
+            "All Whips": DS3EquipCategory.M_WHIP.subcategories,
+            "All Fists": DS3EquipCategory.M_FIST.subcategories,
+            "All Claws": DS3EquipCategory.M_CLAW.subcategories,
+            "All Shields": DS3EquipCategory.M_SHIELD.subcategories,
 
             # Some main categories are single category so the subcategories are technically repeating, this is done 
             # intentionally in case of user confusion believing that perhaps single category subcategories belong 
             # to another main category and thus could be accidentally omitted
-            "Dagger": DS3EquipCategory.DAGGER,
-            "Straight Sword": DS3EquipCategory.STRAIGHT_SWORD,
-            "Greatsword": DS3EquipCategory.GREATSWORD,
-            "Ultra Greatsword": DS3EquipCategory.ULTRA_GREATSWORD,
-            "Curved Sword": DS3EquipCategory.CURVED_SWORD,
-            "Curved Greatsword": DS3EquipCategory.CURVED_GREATSWORD,
-            "Thrusting Sword": DS3EquipCategory.THRUSTING_SWORD,
-            "Katana": DS3EquipCategory.KATANA,
-            "Axe": DS3EquipCategory.AXE,
-            "Greataxe": DS3EquipCategory.GREATAXE,
-            "Hammer": DS3EquipCategory.HAMMER,
-            "Great Hammer": DS3EquipCategory.GREAT_HAMMER,
-            "Spear": DS3EquipCategory.SPEAR,
-            "Halberd": DS3EquipCategory.HALBEARD,
-            "Pike": DS3EquipCategory.PIKE,
-            "Reaper": DS3EquipCategory.REAPER,
-            "Whip": DS3EquipCategory.WHIP,
-            "Fist": DS3EquipCategory.FIST,
-            "Claw": DS3EquipCategory.CLAW,
-            "Bow": DS3EquipCategory.BOW,
-            "Greatbow": DS3EquipCategory.GREATBOW,
-            "Crossbow": DS3EquipCategory.CROSSBOW,
-            "Staff": DS3EquipCategory.STAFF,
-            "Talisman": DS3EquipCategory.TALISMAN,
-            "Pyromancy Flame": DS3EquipCategory.PYROMANCY_FLAME,
-            "Sacred Chime": DS3EquipCategory.SACRED_CHIME,
-            "Small Shield": DS3EquipCategory.SMALL_SHIELD,
-            "Standard Shield": DS3EquipCategory.STANDARD_SHIELD,
-            "Greatshield": DS3EquipCategory.GREATSHIELD,
+            "Dagger": [DS3EquipCategory.DAGGER],
+            "Straight Sword": [DS3EquipCategory.STRAIGHT_SWORD],
+            "Greatsword": [DS3EquipCategory.GREATSWORD],
+            "Ultra Greatsword": [DS3EquipCategory.ULTRA_GREATSWORD],
+            "Curved Sword": [DS3EquipCategory.CURVED_SWORD],
+            "Curved Greatsword": [DS3EquipCategory.CURVED_GREATSWORD],
+            "Thrusting Sword": [DS3EquipCategory.THRUSTING_SWORD],
+            "Katana": [DS3EquipCategory.KATANA],
+            "Axe": [DS3EquipCategory.AXE],
+            "Greataxe": [DS3EquipCategory.GREATAXE],
+            "Hammer": [DS3EquipCategory.HAMMER],
+            "Great Hammer": [DS3EquipCategory.GREAT_HAMMER],
+            "Spear": [DS3EquipCategory.SPEAR],
+            "Halberd": [DS3EquipCategory.HALBEARD],
+            "Pike": [DS3EquipCategory.PIKE],
+            "Reaper": [DS3EquipCategory.REAPER],
+            "Whip": [DS3EquipCategory.WHIP],
+            "Fist": [DS3EquipCategory.FIST],
+            "Claw": [DS3EquipCategory.CLAW],
+            "Bow": [DS3EquipCategory.BOW],
+            "Greatbow": [DS3EquipCategory.GREATBOW],
+            "Crossbow": [DS3EquipCategory.CROSSBOW],
+            "Staff": [DS3EquipCategory.STAFF],
+            "Talisman": [DS3EquipCategory.TALISMAN],
+            "Pyromancy Flame": [DS3EquipCategory.PYROMANCY_FLAME],
+            "Sacred Chime": [DS3EquipCategory.SACRED_CHIME],
+            "Small Shield": [DS3EquipCategory.SMALL_SHIELD],
+            "Standard Shield": [DS3EquipCategory.STANDARD_SHIELD],
+            "Greatshield": [DS3EquipCategory.GREATSHIELD],
         }
+
+
+def mix_categories(categories: List[DS3EquipCategory]) -> List[DS3EquipCategory]:
+    """Mixes all the categories together into one list of subcategories"""
+    result: List = []
+    for e in categories:
+        result.extend(e.subcategories)
+
+    return result
+
 
 @dataclass
 class Infusion(IntEnum):
@@ -251,9 +277,6 @@ class DS3ItemData:
     name: str
     ds3_code: Optional[int]
     category: DS3ItemCategory
-    
-    equip_slot: int = None
-    """The assigned equipment slot if auto equip is on"""
 
     base_ds3_code: Optional[int] = None
     """If this is an upgradable weapon, the base ID of the weapon it upgrades from.
@@ -404,41 +427,6 @@ class DS3ItemData:
             DS3ItemCategory.ARMOR,
             DS3ItemCategory.RING,
         ]
-
-    def get_equip_slot(self, slot_options: List) -> int:
-        """Turns a list of slot options into an int representing the items slot value"""
-        if(self.category == DS3ItemCategory.ARMOR):
-            return 10 # Armor is not put in slots, 10 is reserved for marking armor
-        
-        slot_option_length = 4 if self.category == DS3ItemCategory.RING else 6
-
-        if(len(slot_options) > slot_option_length):
-            raise RuntimeError(f"""{self.name}: equip slot options over range, 
-                               f'maximum {slot_option_length}: Received {len(slot_options)}""")
-
-        potential_slots = []
-        all_categories = DS3EquipCategory.get_all_categories()
-        for i in range(len(slot_options)):
-            current_slot = []
-            for category in all_categories.keys():
-                if category in slot_options[i]:
-                    category_to_push = all_categories[category]
-                    if isinstance(category_to_push, list):
-                        current_slot.extend(category_to_push)
-                    else:
-                        current_slot.append(category_to_push)
-            if len(current_slot) == 0:
-                potential_slots += [i+1]
-                continue
-            if DS3EquipCategory.NO_EQUIP in current_slot: 
-                continue
-            potential_slots += [i+1 for e in current_slot
-                                if (self.equip and (e == self.equip or e == self.equip.main_category)) 
-                                or e == self.category ]
-        
-        if(len(potential_slots) == 0):
-            return 0  # If no potential rules exist, we return 0, this item will never be equipped
-        return choice(potential_slots)
     
     def __hash__(self) -> int:
         return (self.name, self.ds3_code).__hash__()
